@@ -21,7 +21,5 @@ int main(int argc, char *argv[])
         Qt::QueuedConnection);
     engine.loadFromModule("Oscilloscope", "Main");
 
-    QObject::connect(m->getSerialPort(), SIGNAL(readyRead()), m, SLOT(getNewValueFromSerialPort()));
-
     return app.exec();
 }

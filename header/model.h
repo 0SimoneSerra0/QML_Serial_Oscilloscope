@@ -24,9 +24,8 @@ public:
     explicit Model(QObject *parent = nullptr);
     ~Model();
 
-    inline QSerialPort* getSerialPort() {return serial_port;}
-
     Q_INVOKABLE inline std::vector<QPointF> getLine() {return lines;}
+    Q_INVOKABLE void clearLine();
 
     Q_INVOKABLE static std::vector<QString> getAllAvailablePortName();
     Q_INVOKABLE static std::vector<uint32_t> getCommonBaudRates();
@@ -41,12 +40,22 @@ public:
     Q_INVOKABLE bool changeStopBits(uint8_t index);
     Q_INVOKABLE bool changeFlowControl(uint8_t index);
 
+
     Q_INVOKABLE bool openClosePort(bool open);
     Q_INVOKABLE bool isPortOpen();
+
+    Q_INVOKABLE bool writeSerialData(QString s);
 
 
     Q_INVOKABLE void changeXZoom(int32_t zoom);
     Q_INVOKABLE void changeYZoom(int32_t zoom);
+
+    Q_INVOKABLE void zoomIn();
+    Q_INVOKABLE void zoomOut();
+
+    Q_INVOKABLE std::vector<double> getAxisZoom();
+    Q_INVOKABLE static std::vector<int32_t> getZoomLimits();
+
 
     Q_INVOKABLE std::vector<double> getXAxisLimits();
     Q_INVOKABLE std::vector<double> getYAxisLimits();
@@ -54,17 +63,9 @@ public:
     Q_INVOKABLE std::vector<double> getZoomedXAxisLimits();
     Q_INVOKABLE std::vector<double> getZoomedYAxisLimits();
 
-    Q_INVOKABLE std::vector<double> getAxisZoom();
-
     Q_INVOKABLE void changeXLimits(double new_min, double new_max);
     Q_INVOKABLE void changeYLimits(double new_min, double new_max);
 
-    Q_INVOKABLE void zoomIn();
-    Q_INVOKABLE void zoomOut();
-
-    Q_INVOKABLE static std::vector<int32_t> getZoomLimits();
-
-    Q_INVOKABLE bool writeSerialData(QString s);
 
     Q_INVOKABLE void setPlotFollowing(bool value);
     Q_INVOKABLE bool getPlotFollowing();
@@ -75,8 +76,6 @@ public:
     Q_INVOKABLE void setSeeWholeCurve(bool value);
     Q_INVOKABLE bool getSeeWholeCurve();
 
-    Q_INVOKABLE inline void clearLine(){lines.clear(); emit refreshLine();}
-
     Q_INVOKABLE inline double getMinDistanceBetweenAxisLimits() const {return MIN_DISTANCE_BETWEEN_AXIS_LIMITS;}
 
 private:
@@ -85,12 +84,11 @@ private:
     QSerialPort* serial_port;
 
     double axis_limits[2][2] = {{0,10}, {0,10}};
-    static constexpr int32_t zoom_limits[] = {-100, 100};
 
+    static constexpr int32_t zoom_limits[] = {-100, 100};
     double axis_zoom[2] = {0, 0};
 
     bool see_whole_curve = false;
-
     bool plot_following = true;
     bool show_points = false;
 
@@ -98,7 +96,6 @@ private:
     void modifyYLimits(double new_min, double new_max);
 
     void follow_plot();
-
     void seeWholeCurve();
 
 signals:
