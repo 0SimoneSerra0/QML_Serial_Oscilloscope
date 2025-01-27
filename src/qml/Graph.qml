@@ -43,9 +43,63 @@ Item {
         }
 
 
+<<<<<<< HEAD
 
 
 
+=======
+        MouseArea{
+            id: mouse_area_graph
+
+            property double init_x
+            property double init_y
+
+            anchors.fill: parent
+
+            onPressed:{
+                init_x = mouseX
+                init_y = mouseY
+                update_drag_timer.start()
+            }
+
+            onReleased:{
+                update_drag_timer.stop()
+            }
+
+            onExited:{
+                update_drag_timer.stop()
+            }
+
+            onWheel:{
+                Model.changeXLimits(Model.getXAxisLimits()[0] + wheel.angleDelta.x*0.5, Model.getXAxisLimits()[1] - wheel.angleDelta.x*0.5)
+                Model.changeYLimits(Model.getYAxisLimits()[0] + wheel.angleDelta.y*0.5, Model.getYAxisLimits()[1] - wheel.angleDelta.y*0.5)
+            }
+
+            //handle the movment of the mouse while pressed on the graph
+            Timer{
+                id: update_drag_timer
+
+                property real deltaX
+                property real deltaY
+
+                repeat: true
+                interval: 5
+
+                onTriggered:{
+                    deltaX = Math.abs(Model.getZoomedXAxisLimits()[1] - Model.getZoomedXAxisLimits()[0])*(mouse_area_graph.init_x - mouse_area_graph.mouseX)/(graph.width*0.9)
+                    deltaY = Math.abs(Model.getZoomedYAxisLimits()[1] - Model.getZoomedYAxisLimits()[0])*(mouse_area_graph.init_y - mouse_area_graph.mouseY)/(graph.height*0.84)
+
+                    Model.changeXLimits(Model.getXAxisLimits()[0] + deltaX, Model.getXAxisLimits()[1] + deltaX);
+                    Model.changeYLimits(Model.getYAxisLimits()[0] - deltaY, Model.getYAxisLimits()[1] - deltaY);
+
+                    mouse_area_graph.init_x = mouse_area_graph.mouseX
+                    mouse_area_graph.init_y = mouse_area_graph.mouseY
+                }
+            }
+        }
+
+
+>>>>>>> e6d2053 (Added comment and code rearranged)
         //lights in the bottom left of the graph part
         Rectangle{
             id: state_light_close
@@ -86,6 +140,7 @@ Item {
     GraphsView{
         id:graph
 
+<<<<<<< HEAD
         anchors.fill: parent
         anchors.margins: width/50
 
@@ -182,26 +237,68 @@ Item {
 
                 mouse_area_graph.init_x = mouse_area_graph.mouseX
                 mouse_area_graph.init_y = mouse_area_graph.mouseY
+=======
+            axisX: ValueAxis {
+                id:x_axis
+
+                min: -5
+                max: 5
+                tickInterval: 1
+                subTickCount: 1
+                labelDecimals: 1
+            }
+
+            axisY: ValueAxis {
+                id:y_axis
+
+                min: -5
+                max: 5
+                tickInterval: 1
+                subTickCount: 1
+                labelDecimals: 1
+            }
+
+            CustomLineSeries {
+                id: line_series
+
+                graph: graph
+                width: graph.width/250
+>>>>>>> e6d2053 (Added comment and code rearranged)
             }
         }
     }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> e6d2053 (Added comment and code rearranged)
     //handle all the intrested signal from the Model
     Connections{
         target: Model
 
+<<<<<<< HEAD
         function onPortStateChanged(state){
+=======
+        property int i: 0
+        property var points
+
+        function onUpdateStateLights(state){
+>>>>>>> e6d2053 (Added comment and code rearranged)
             state_light_close.color = state ? Qt.darker("red") : "red"
             state_light_open.color = state ? "green" : Qt.darker("green")
         }
 
+<<<<<<< HEAD
         function onUpdateLine(name){
             if(Scripts.getLineSeries(name) === null){
                 Scripts.createLineSeries(graph, name, Model.getLineColor(name))
                 graph.addSeries(Scripts.getLineSeries(name))
             }
             Scripts.appendToLineSeries(name, Model.getLine(name)[Model.getLine(name).length - 1].x, Model.getLine(name)[Model.getLine(name).length - 1].y)
+=======
+        function onUpdateLine(){
+            line_series.append(Model.getLine()[Model.getLine().length - 1].x, Model.getLine()[Model.getLine().length - 1].y)
+>>>>>>> e6d2053 (Added comment and code rearranged)
         }
 
         function onUpdateAxis(){
@@ -215,6 +312,7 @@ Item {
         }
 
         function onRefreshLine(){
+<<<<<<< HEAD
             var s = Model.getSelectedLine()
             var points
             if(s === "")
@@ -248,6 +346,15 @@ Item {
             Scripts.eliminateLineSeries(line_name)
             return
         }
+=======
+            line_series.clear()
+            line_series.setLabelToNull()
+            points = Model.getLine()
+            for(i = 0; i < points.length; i+=1){
+                line_series.append(points[i].x(), points[i].y())
+            }
+        }
+>>>>>>> e6d2053 (Added comment and code rearranged)
     }
 }
 
