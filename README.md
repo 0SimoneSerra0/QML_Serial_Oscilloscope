@@ -37,7 +37,6 @@ In the actual version of the project the main feature are:
 
 ## ToDo List
 - add an icon
-- Tidying the code, making more comment explaining which code does what so that anyone can easely modify and customize the program;
 - Implement a way to handle multiple series plot and makes it coherent with all the other function;
 - making the UI look nicer.
 <br>
