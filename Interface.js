@@ -1,0 +1,6 @@
+import MyModel
+
+
+function func() {
+
+}
