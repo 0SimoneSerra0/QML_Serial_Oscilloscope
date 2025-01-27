@@ -54,9 +54,9 @@ At the moment the name part is useless but it will use in future version where t
 <br>
 
 ## Screenshots
-![Screenshot_1](https://github.com/user-attachments/assets/6d349fcd-8e54-4b86-99b8-c4eeae298960)
+![Screenshot_2](https://github.com/user-attachments/assets/2a78e84e-53c4-440e-ab46-5149b56ebc33)
 <br>
-![Screenshot_2](https://github.com/user-attachments/assets/d1ce2749-4ac2-4bc1-9a41-69dd0303b80f)
+![Screenshot_1](https://github.com/user-attachments/assets/381b81fa-33e1-48d7-8f02-4d22b1b9045a)
 <br>
 <br>
 <br>
