@@ -9,22 +9,27 @@ find_package(Qt6 REQUIRED COMPONENTS Quick SerialPort)
 qt_standard_project_setup(REQUIRES 6.5)
 
 qt_add_executable(appOscilloscope
-    main.cpp
-    model.h
-    model.cpp
+    src/main.cpp
+    header/model.h
+    src/model.cpp
 )
 
 qt_add_qml_module(appOscilloscope
     URI Oscilloscope
     VERSION 1.0
-    QML_FILES Main.qml ErrorTerminal.qml SerialPortOption.qml Graph.qml
-    QML_FILES SerialIOInterface.qml
-    QML_FILES GraphControls.qml
-    QML_FILES CustomDial.qml
-    QML_FILES scripts.js
-    QML_FILES LabelPointCoordinates.qml
-    QML_FILES CustomLineSeries.qml
-    QML_FILES CustomTextEdit.qml
+
+QML_FILES
+    src/qml/CustomDial.qml
+    src/qml/CustomLineSeries.qml
+    src/qml/CustomTextEdit.qml
+    src/qml/ErrorTerminal.qml
+    src/qml/Graph.qml
+    src/qml/GraphControls.qml
+    src/qml/LabelPointCoordinates.qml
+    src/qml/Main.qml
+    src/qml/scripts.js
+    src/qml/SerialIOInterface.qml
+    src/qml/SerialPortOption.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

@@ -1,6 +1,6 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-#include "model.h"
+#include "header/model.h"
 
 int main(int argc, char *argv[])
 {

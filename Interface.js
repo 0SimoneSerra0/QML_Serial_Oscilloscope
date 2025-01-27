@@ -1,6 +1,0 @@
-import MyModel
-
-
-function func() {
-
-}
