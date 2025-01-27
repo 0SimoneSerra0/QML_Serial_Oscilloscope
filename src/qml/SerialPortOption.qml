@@ -301,6 +301,10 @@ Item {
             id: open_and_close_button
 
             property bool btn_pressed : false
+<<<<<<< HEAD
+=======
+            property bool port_open: Model.isPortOpen()
+>>>>>>> e6d2053 (Added comment and code rearranged)
 
             y: label_flow_control_bg.y + label_flow_control_bg.height * 1.1
 
@@ -311,6 +315,17 @@ Item {
 
             color: root.bg_color
             border.color: root.bg_border_color
+<<<<<<< HEAD
+=======
+
+            Connections{
+                target: Model
+                function onPortChanged(port_state){
+                    label_open_and_close_button.text = port_state ? "Close Port" : "Open Port"
+                    open_and_close_button.port_open = Model.isPortOpen()
+                }
+            }
+>>>>>>> e6d2053 (Added comment and code rearranged)
 
             Label{
                 id: label_open_and_close_button
@@ -320,7 +335,11 @@ Item {
                 color: root.text_color
                 font.pixelSize: 1/17 * root.width
                 font.bold: true
+<<<<<<< HEAD
                 text: Model.isPortOpen() ? "Close Port" : "Open Port"
+=======
+                text: open_and_close_button.port_open ? "Close Port" : "Open Port"
+>>>>>>> e6d2053 (Added comment and code rearranged)
             }
             MouseArea{
                 id: mouse_area_open_and_close_button

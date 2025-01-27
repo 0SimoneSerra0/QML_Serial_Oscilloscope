@@ -17,7 +17,10 @@ Item {
 
     required property var anchors_mouse_area
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> e6d2053 (Added comment and code rearranged)
     //Text on top of the interface
     Rectangle{
         id: recived_label_bg
@@ -61,6 +64,7 @@ Item {
             clip: true
             color: Qt.lighter(root.text_color)
 
+<<<<<<< HEAD
             onFocusChanged:{
                 if(focus){
                     Scripts.createMouseArea(this, root.anchors_mouse_area)
@@ -69,6 +73,8 @@ Item {
                 }
             }
 
+=======
+>>>>>>> e6d2053 (Added comment and code rearranged)
             onAccepted:{
                 if(text_input.text === ""){
                     return
@@ -175,7 +181,11 @@ Item {
             x: bg_input.border.width
             y: bg_input.border.width
 
+<<<<<<< HEAD
             width: parent.width
+=======
+            width: parent.width//bg_input.width - bg_input.border.width*2
+>>>>>>> e6d2053 (Added comment and code rearranged)
             height: bg_input.height - bg_input.border.width*2
 
             contentWidth: bg_input.width
@@ -184,7 +194,10 @@ Item {
 
             TextArea{
                 id: text_area
+<<<<<<< HEAD
                 property int max_text_length: 4000
+=======
+>>>>>>> e6d2053 (Added comment and code rearranged)
 
                 property bool auto_scroll: true
 
@@ -196,6 +209,7 @@ Item {
                 readOnly: true
                 text: ""
 
+<<<<<<< HEAD
                 onFocusChanged:{
                     if(focus){
                         Scripts.createMouseArea(this, root.anchors_mouse_area)
@@ -204,6 +218,8 @@ Item {
                     }
                 }
 
+=======
+>>>>>>> e6d2053 (Added comment and code rearranged)
                 onTextChanged:{
                     if(text_area.auto_scroll){
                         scroll_view.ScrollBar.vertical.position = scroll_view.contentHeight >= scroll_view.height ? 1 - scroll_view.height/scroll_view.contentHeight : 0
@@ -220,12 +236,17 @@ Item {
         function onAppendSerialData(data){
             scroll_view.old_scroll_position = scroll_view.ScrollBar.vertical.position
             scroll_view.old_content_height = scroll_view.contentHeight
+<<<<<<< HEAD
             text_area.append(data)
             if(text_area.text.length > text_area.max_text_length){
                 text_area.text = text_area.text.substr(text_area.text.length - text_area.max_text_length, text_area.max_text_length)
                 text_area.text = text_area.text.substr(text_area.text.indexOf("£$"))
                 text_area.textChanged()
             }
+=======
+            text_area.text += data
+            text_area.textChanged()
+>>>>>>> e6d2053 (Added comment and code rearranged)
         }
     }
 }

@@ -15,7 +15,10 @@ Item {
 
     required property var anchors_mouse_area
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> e6d2053 (Added comment and code rearranged)
     //X zoom controls
     CustomDial {
         id: dial_x_axis
@@ -289,7 +292,10 @@ Item {
         MouseArea{
             id: mouse_area_see_whole_curve_btn
 
+<<<<<<< HEAD
             property bool active: false
+=======
+>>>>>>> e6d2053 (Added comment and code rearranged)
             anchors.fill: parent
 
             onClicked:{
@@ -367,6 +373,7 @@ Item {
         }
     }
 
+<<<<<<< HEAD
     //Eliminate line button
     Rectangle{
         id: eliminate_btn
@@ -428,6 +435,11 @@ Item {
 
     //plot follow button
     Rectangle{
+=======
+
+    //plot follow button
+    Rectangle{
+>>>>>>> e6d2053 (Added comment and code rearranged)
         id: plot_following_btn
 
         x: go_to_origin_btn.x + go_to_origin_btn.width*1.1
@@ -438,10 +450,17 @@ Item {
         radius: width/20
 
         border.width: width/10
+<<<<<<< HEAD
 
         color: Qt.darker(Qt.darker(root.bg_color))
         border.color: Qt.darker(Qt.darker(color))
 
+=======
+
+        color: Qt.darker(root.bg_color)
+        border.color: Qt.darker(color)
+
+>>>>>>> e6d2053 (Added comment and code rearranged)
         Shape{
             id: plot_following_symbol
 
@@ -466,8 +485,11 @@ Item {
         MouseArea{
             id: mouse_area_plot_following_btn
 
+<<<<<<< HEAD
             property bool active: false
 
+=======
+>>>>>>> e6d2053 (Added comment and code rearranged)
             anchors.fill: parent
 
             onClicked:{
@@ -604,6 +626,15 @@ Item {
 
             width: label_x_limit_bg.width
             height: label_x_limit_bg.height
+<<<<<<< HEAD
+=======
+
+            mode: "x_min"
+            text_color: root.text_color
+        }
+        CustomTextEdit{
+            id: max_x_limit
+>>>>>>> e6d2053 (Added comment and code rearranged)
 
             mode: "x_min"
             text_color: root.text_color
@@ -654,6 +685,15 @@ Item {
 
             width: label_y_limit_bg.width
             height: label_y_limit_bg.height
+<<<<<<< HEAD
+=======
+
+            mode: "y_min"
+            text_color: root.text_color
+        }
+        CustomTextEdit{
+            id: max_y_limit
+>>>>>>> e6d2053 (Added comment and code rearranged)
 
             mode: "y_min"
             text_color: root.text_color
@@ -703,6 +743,18 @@ Item {
                     symbol_see_whole_curve.border.color = Qt.darker(root.text_color)
                 }
             }
+        }
+    }
+
+    Connections{
+        target: Model
+
+        function onUpdateGraphControls(){
+            dial_x_axis.value = Model.getAxisZoom()[0]
+            spin_box_x_axis.value = dial_x_axis.value
+
+            dial_y_axis.value = Model.getAxisZoom()[1]
+            spin_box_y_axis.value = dial_y_axis.value
         }
     }
 }
