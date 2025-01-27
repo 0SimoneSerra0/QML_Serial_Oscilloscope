@@ -3,40 +3,32 @@ import QtQuick.Controls
 import QtQuick.Shapes
 import MyModel
 
+//Control panel found at the bottom of the graph
 Item {
     id:root
+
     property color text_color: "white"
     property color bg_color: "#202020"
     property color dial_pointer_color: "white"
     property color bg_text_color: "#303030"
 
 
-    Connections{
-        target: Model
-        function onUpdateGraphControls(){
-            dial_x_axis.value = Model.getAxisZoom()[0]*10
-            spin_box_x_axis.value = dial_x_axis.value
-
-            dial_y_axis.value = Model.getAxisZoom()[1]*10
-            spin_box_y_axis.value = dial_y_axis.value
-        }
-    }
-
+    //X zoom controls
     CustomDial {
         id: dial_x_axis
 
         x: (label_zoom_y_axis_bg.width - width)/2
         y: (root.height - height)/4
 
-        bg_color: root.bg_color
-        pointer_color: root.dial_pointer_color
-
         width: root.width/15
         height: width
 
-        from: Model.getZoomLimits()[0]*10
-        to: Model.getZoomLimits()[1]*10
-        stepSize: 10
+        bg_color: root.bg_color
+        pointer_color: root.dial_pointer_color
+
+        from: Model.getZoomLimits()[0]
+        to: Model.getZoomLimits()[1]
+        stepSize: 1
         value: 0
 
         onMoved:{
@@ -46,9 +38,10 @@ Item {
 
         Rectangle{
             id: label_zoom_x_axis_bg
-            anchors.horizontalCenter: dial_x_axis.horizontalCenter
 
+            anchors.horizontalCenter: dial_x_axis.horizontalCenter
             y: -dial_x_axis.y
+
             width: label_zoom_x_axis.text.length*label_zoom_x_axis.font.pointSize
             height: label_zoom_x_axis.font.pointSize*2
 
@@ -95,16 +88,9 @@ Item {
             }
         }
     }
-    Text{
-        id: shortcut_label
-        text: "Ctrl + plus  ->  Zoom In\nCtrl + minus  ->  Zoom Out"
-        color: Qt.darker(root.text_color)
-        font.pointSize: dial_x_axis.width/7
-        y: root.height*0.9 - height
-    }
 
 
-
+    //Y zoom controls
     CustomDial {
         id: dial_y_axis
 
@@ -117,8 +103,8 @@ Item {
         width: root.width/15
         height: width
 
-        from: Model.getZoomLimits()[0]*10
-        to: Model.getZoomLimits()[1]*10
+        from: Model.getZoomLimits()[0]
+        to: Model.getZoomLimits()[1]
         stepSize: 10
         value: 0
 
@@ -132,6 +118,7 @@ Item {
             anchors.horizontalCenter: dial_y_axis.horizontalCenter
 
             y: -dial_y_axis.y
+
             width: label_zoom_y_axis.text.length*label_zoom_y_axis.font.pointSize
             height: label_zoom_y_axis.font.pointSize*2
 
@@ -179,19 +166,30 @@ Item {
         }
     }
 
+    Text{
+        id: shortcut_label
+
+        y: root.height*0.9 - height
+        font.pointSize: dial_x_axis.width/7
+        color: Qt.darker(root.text_color)
+        text: "Ctrl + plus  ->  Zoom In\nCtrl + minus  ->  Zoom Out"
+    }
+
+    //Go To Origin button
     Rectangle{
         id: go_to_origin_btn
-        width: dial_x_axis.width/2
-        height: width
-        radius: width/2
 
         x: dial_y_axis.x + dial_y_axis.width + (root.width - dial_y_axis.x)/10
         y: dial_y_axis.y
 
+
+        width: dial_x_axis.width/2
+        height: width
+        radius: width/2
         border.width: width/10
-        border.color: Qt.darker(color)
 
         color: Qt.darker(root.bg_color)
+        border.color: Qt.darker(color)
 
         Text{
             id: text_go_to_origin_btn
@@ -203,14 +201,18 @@ Item {
 
         MouseArea{
             id: mouse_area_go_to_origin_btn
+
             property bool pressed: false
+
             anchors.fill: parent
+
             onPressed:{
                 go_to_origin_btn.color = Qt.darker(go_to_origin_btn.color)
                 go_to_origin_btn.border.color = Qt.darker(go_to_origin_btn.border.color)
                 text_go_to_origin_btn.color = Qt.darker(text_go_to_origin_btn.color)
                 pressed = true
             }
+
             onExited:{
                 if(pressed){
                     go_to_origin_btn.color = Qt.darker(root.bg_color)
@@ -219,6 +221,7 @@ Item {
                     pressed = false
                 }
             }
+
             onReleased:{
                 if(pressed){
                     Model.changeXLimits(-5, 5)
@@ -233,35 +236,40 @@ Item {
     }
 
 
-
+    //see whole curve button
     Rectangle{
         id: see_whole_curve_btn
-        width: dial_x_axis.width/2
-        height: width
-        radius: width/20
 
         x: go_to_origin_btn.x
         y: go_to_origin_btn.y + go_to_origin_btn.height*1.1
 
+        width: dial_x_axis.width/2
+        height: width
         border.width: width/10
-        border.color: Qt.darker(color)
+        radius: width/20
 
         color: Qt.darker(Qt.darker(root.bg_color))
+        border.color: Qt.darker(color)
 
         Rectangle{
             id: symbol_see_whole_curve
-            width: parent.width/2
-            height: width
-            color: Qt.rgba(0,0,0,0)
-            border.color: Qt.darker(root.text_color)
-            border.width: width/7
+
             x: (parent.width - width)/2
             y: (parent.height - height)/2
+
+            width: parent.width/2
+            height: width
+            border.width: width/7
+
+            color: Qt.rgba(0,0,0,0)
+            border.color: Qt.darker(root.text_color)
         }
 
         MouseArea{
             id: mouse_area_see_whole_curve_btn
+
             anchors.fill: parent
+
             onClicked:{
                 Model.setSeeWholeCurve(!Model.getSeeWholeCurve())
                 if(Model.getSeeWholeCurve()){
@@ -278,23 +286,26 @@ Item {
     }
 
 
+    //Clear line button
     Rectangle{
         id: clear_line_btn
-        width: dial_x_axis.width/2
-        height: width
-        radius: width/2
 
         x: see_whole_curve_btn.x + see_whole_curve_btn.width*1.1
         y: see_whole_curve_btn.y
 
+        width: dial_x_axis.width/2
+        height: width
         border.width: width/10
-        border.color: Qt.darker(color)
+        radius: width/2
 
         color: Qt.darker(root.bg_color)
+        border.color: Qt.darker(color)
 
         Text{
             id: text_clear_line_btn
+
             text: "Clear"
+
             color: root.text_color
             font.pointSize: parent.width/5
             anchors.centerIn: parent
@@ -302,8 +313,11 @@ Item {
 
         MouseArea{
             id: mouse_area_clear_line_btn
+
             property bool pressed: false
+
             anchors.fill: parent
+
             onPressed:{
                 clear_line_btn.color = Qt.darker(clear_line_btn.color)
                 clear_line_btn.border.color = Qt.darker(clear_line_btn.border.color)
@@ -331,31 +345,37 @@ Item {
     }
 
 
-
+    //plot follow button
     Rectangle{
         id: plot_following_btn
-        width: dial_x_axis.width/2
-        height: width
-        radius: width/20
 
         x: go_to_origin_btn.x + go_to_origin_btn.width*1.1
         y: dial_y_axis.y
 
+        width: dial_x_axis.width/2
+        height: width
+        radius: width/20
+
         border.width: width/10
-        border.color: Qt.darker(color)
 
         color: Qt.darker(root.bg_color)
+        border.color: Qt.darker(color)
+
         Shape{
             id: plot_following_symbol
+
+            x: parent.width*3/10 - (plot_following_btn.width*3*Math.sqrt(3)/10)/2
+
             width:parent.width
             height: parent.height
-            x: parent.width*3/10 - (plot_following_btn.width*3*Math.sqrt(3)/10)/2
 
             ShapePath{
                 id: shape_path_plot_following_symbol
+
                 strokeWidth: plot_following_btn.width/10
                 strokeColor: root.text_color
                 fillColor: Qt.rgba(0,0,0,0)
+
                 startX: plot_following_btn.width/5; startY: plot_following_btn.height/5
                 PathLine{x: plot_following_btn.width/5 + plot_following_btn.width*3*Math.sqrt(3)/10; y: plot_following_btn.height/2}
                 PathLine{x: plot_following_btn.width/5; y: plot_following_btn.height*4/5}
@@ -364,7 +384,9 @@ Item {
 
         MouseArea{
             id: mouse_area_plot_following_btn
+
             anchors.fill: parent
+
             onClicked:{
                 Model.setPlotFollowing(!Model.getPlotFollowing())
                 if(Model.getPlotFollowing()){
@@ -380,22 +402,24 @@ Item {
         }
     }
 
+    //Show point button
     Rectangle{
         id: show_points_btn
-        width: dial_x_axis.width/2
-        height: width
-        radius: width/20
 
         x: plot_following_btn.x + plot_following_btn.width*1.1
         y: dial_y_axis.y
 
+        width: dial_x_axis.width/2
+        height: width
         border.width: width/10
-        border.color: Qt.darker(Qt.darker(color))
+        radius: width/20
 
         color: Qt.darker(Qt.darker(root.bg_color))
+        border.color: Qt.darker(Qt.darker(color))
 
         Rectangle{
             id: show_points_symbol
+
             anchors.centerIn: parent
             width: parent.width/2
             height: width
@@ -405,6 +429,7 @@ Item {
 
         MouseArea{
             id: mouse_area_show_points_btn
+
             anchors.fill: parent
             onClicked:{
                 Model.setShowPoints(!Model.getShowPoints())
@@ -422,21 +447,22 @@ Item {
     }
 
 
-
+    //X limit controls
     Rectangle{
         id: label_x_limit_bg
 
-        width: (root.width - show_points_btn.x)/6
-        height: 1/4*width
-
         x: show_points_btn.x + show_points_btn.width*4
         y: root.height/2 - height*1.5
+
+        width: (root.width - show_points_btn.x)/6
+        height: 1/4*width
 
         color: root.bg_color
         border.color: Qt.darker(color)
 
         Text{
             id:text_min_x_limit
+
             anchors.centerIn: parent
             text: "X Axis: "
             font.pointSize: label_x_limit_bg.height/2
@@ -446,17 +472,18 @@ Item {
         Rectangle{
             id: label_min_limit_bg
 
+            y: -height*1.5
+            anchors.horizontalCenter: min_x_limit.horizontalCenter
+
             width: (root.width - show_points_btn.x)/6
             height: 1/4*width
-
-            anchors.horizontalCenter: min_x_limit.horizontalCenter
-            y: -height*1.5
 
             color: root.bg_color
             border.color: Qt.darker(color)
 
             Text{
                 id: text_min_limit
+
                 anchors.centerIn: parent
                 text: "Left Limit"
                 font.pointSize: label_min_limit_bg.height/2
@@ -467,17 +494,18 @@ Item {
         Rectangle{
             id: label_max_limit_bg
 
-            width: (root.width - show_points_btn.x)/6
-            height: 1/4*width
-
             anchors.horizontalCenter: max_x_limit.horizontalCenter
             y: -height*1.5
+
+            width: (root.width - show_points_btn.x)/6
+            height: 1/4*width
 
             color: root.bg_color
             border.color: Qt.darker(color)
 
             Text{
                 id: text_max_limit
+
                 anchors.centerIn: parent
                 text: "Right Limit"
                 font.pointSize: label_max_limit_bg.height/2
@@ -487,40 +515,44 @@ Item {
 
         CustomTextEdit{
             id: min_x_limit
-            width: label_x_limit_bg.width
-            height: label_x_limit_bg.height
 
             x: label_x_limit_bg.width + width/4
+
+            width: label_x_limit_bg.width
+            height: label_x_limit_bg.height
 
             mode: "x_min"
             text_color: root.text_color
         }
         CustomTextEdit{
             id: max_x_limit
-            width: label_x_limit_bg.width
-            height: label_x_limit_bg.height
 
             x: min_x_limit.x + min_x_limit.width*1.5
+
+            width: label_x_limit_bg.width
+            height: label_x_limit_bg.height
 
             mode: "x_max"
             text_color: root.text_color
         }
     }
 
+    //Y limit controls
     Rectangle{
         id: label_y_limit_bg
 
+        y: root.height/2 + height*1.5
+        x: show_points_btn.x + show_points_btn.width*4
+
         width: (root.width - show_points_btn.x)/6
         height: 1/4*width
-
-        x: show_points_btn.x + show_points_btn.width*4
-        y: root.height/2 + height*1.5
 
         color: root.bg_color
         border.color: Qt.darker(color)
 
         Text{
             id: text_min_y_limit
+
             anchors.centerIn: parent
             text: "Y Axis:"
             font.pointSize: label_y_limit_bg.height/2
@@ -529,23 +561,37 @@ Item {
 
         CustomTextEdit{
             id: min_y_limit
-            width: label_y_limit_bg.width
-            height: label_y_limit_bg.height
 
             x: label_y_limit_bg.width + width/4
+
+            width: label_y_limit_bg.width
+            height: label_y_limit_bg.height
 
             mode: "y_min"
             text_color: root.text_color
         }
         CustomTextEdit{
             id: max_y_limit
-            width: label_y_limit_bg.width
-            height: label_y_limit_bg.height
 
             x: min_y_limit.x + min_y_limit.width*1.5
 
+            width: label_y_limit_bg.width
+            height: label_y_limit_bg.height
+
             mode: "y_max"
             text_color: root.text_color
+        }
+    }
+
+    Connections{
+        target: Model
+
+        function onUpdateGraphControls(){
+            dial_x_axis.value = Model.getAxisZoom()[0]
+            spin_box_x_axis.value = dial_x_axis.value
+
+            dial_y_axis.value = Model.getAxisZoom()[1]
+            spin_box_y_axis.value = dial_y_axis.value
         }
     }
 }

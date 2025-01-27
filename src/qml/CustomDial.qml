@@ -1,27 +1,30 @@
 import QtQuick
 import QtQuick.Controls
 
+
+//Custom dial used in GraphControls
 Dial{
     id: root
 
     property color bg_color: "#202020"
     property color pointer_color: "white"
+
     stepSize: 1
 
     background: Rectangle {
+
         x: root.width / 2 - width / 2
         y: root.height / 2 - height / 2
+
         implicitWidth: 50
         implicitHeight: 50
-
         width: Math.max(64, Math.min(root.width, root.height))
         height: width
         radius: width / 2
+        border.width: width/7
 
         color: root.bg_color
-
         border.color: Qt.lighter(color)
-        border.width: width/7
     }
 
     handle: Rectangle {
@@ -30,10 +33,12 @@ Dial{
         x: root.background.x + root.background.width / 2 - width / 2
         y: root.background.y + root.background.height / 2 - height / 2
         width: height/4
+
         height: root.background.width/2
         radius: width*2.5
 
         color: Qt.darker(root.bg_color)
+
         antialiasing: true
 
         Rectangle{

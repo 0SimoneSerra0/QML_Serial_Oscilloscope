@@ -4,9 +4,9 @@ import QtQuick.Controls
 
 Window {
     id: root
+
     minimumWidth: 848
     minimumHeight: 480
-
 
     visible: true
     title: "Oscilloscope"
@@ -19,7 +19,7 @@ Window {
         x: root.width - width
     }
 
-
+    //BackGround
     Shape {
         id: cotrol_panel_bg
         width: root.width
@@ -57,27 +57,36 @@ Window {
             PathLine { x: shape.pnt6[0]; y: shape.pnt6[1] }
         }
 
+        //Left side of the oscilloscope (Serial port option)
         Rectangle{
             id: serial_port_options_bg
+
             property real border_width: (shape.pnt2[0] - shape.strokeWidth)/50
 
             x: shape.strokeWidth/2
             y: shape.strokeWidth/2
+
             width: shape.pnt2[0] - x - border_width*0.1
             height: serial_port_options.y + serial_port_options.height + border_width*1.1
             border.width: border_width
+
             color: Qt.rgba(0,0,0,0)
             border.color: Qt.rgba(0,0,0,0.4)
 
+            //label in the top left
             Rectangle{
                 id: serial_port_options_label_bg
+
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: serial_port_options_bg.border_width*1.1
+
                 width: shape.pnt2[0] - shape.strokeWidth - parent.x*2 - serial_port_options_bg.border_width*0.1
                 height: 1/7 * width
-                color: "#505050"
                 border.width: 1/90 * width
+
+                color: "#505050"
                 border.color: "#202020"
+
                 Label{
                     id: serial_port_option_label
                     text: "SERIAL PORT OPTIONS"
@@ -88,6 +97,7 @@ Window {
                     color: "#aaaaaa"
                 }
             }
+
 
             SerialPortOption{
                 id: serial_port_options
@@ -104,6 +114,7 @@ Window {
         }
     }
 
+    //control under the graph
     GraphControls{
         id: graph_controls
         x: graph.x

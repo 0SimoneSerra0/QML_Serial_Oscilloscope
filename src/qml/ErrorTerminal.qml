@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import MyModel
 
+//terminal in te bottom left, it contains the error messages sent from the Model
 Item {
     id: root
     property color color: "#000000"
@@ -12,18 +13,21 @@ Item {
 
     Rectangle {
         id: bg
+
         width: parent.width
         height: parent.height
-        border.color: parent.border_color
         border.width: width/70
+        radius: width/10
+
         color: root.color
-        radius: 6
+        border.color: parent.border_color
 
         ScrollView {
             id: scroll_view
 
             x: bg.border.width * 1.5
             y: bg.border.width * 1.5
+
             height: bg.height - y*2
             width: bg.width - x*2
 

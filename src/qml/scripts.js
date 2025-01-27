@@ -1,3 +1,7 @@
+//This file contains the required function to dnamically create a
+//LabelPointCoordinates
+
+
 var component;
 var label = null;
 var _parent;

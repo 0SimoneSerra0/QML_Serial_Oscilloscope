@@ -4,6 +4,8 @@ Model::Model(QObject *parent)
     : QObject{parent}
 {
     serial_port = new QSerialPort(this);
+
+    QObject::connect(serial_port, SIGNAL(readyRead()), this, SLOT(getNewValueFromSerialPort()));
 }
 
 
@@ -17,8 +19,7 @@ Model::~Model(){
 
 /*
  *getAllAvailablePortName():
- *retuns a vector of QString containing all the accessible serial port in
- *the computer
+ *  The qml part use this method to get the model for the serial port spinbox
 */
 std::vector<QString> Model::getAllAvailablePortName(){
     std::vector<QString> p_names;
@@ -33,9 +34,55 @@ std::vector<QString> Model::getAllAvailablePortName(){
 
 
 /*
+ *getCommonBaudRates()
+ *  The qml part use this method to get the model for the baud rate spinbox
+*/
+std::vector<uint32_t> Model::getCommonBaudRates()
+{
+    return {110, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 38400, 57600, 115200, 128000, 256000};
+}
+
+
+
+/*
+ *getPossibleParity()
+ *  The qml part use this method to get the model for the parity spinbox
+*/
+std::vector<QString> Model::getPossibleParity()
+{
+    return {"Parity None", "Parity Odd", "Parity Even", "Parity Mark", "Parity Space"};
+}
+
+
+/*
+ *getPossibleStopBits()
+ *  The qml part use this method to get the model for the stop bits spinbox
+*/
+std::vector<QString> Model::getPossibleStopBits()
+{
+    return {"One Stop", "Two Stop", "One and half Stop"};
+}
+
+
+
+/*
+ *getPossibleFlowControls()
+ *  The qml part use this method to get the model for the flow control spinbox
+*/
+std::vector<QString> Model::getPossibleFlowControls()
+{
+    return {"No flow control", "Hardware flow control", "Software flow control"};
+}
+
+
+
+
+
+
+/*
  *changePort(uint16_t)
- *Open a serial port given the index of it in the vector returned by the function
- *getAllAvailablePortName
+ *  Open a serial port given the index in the vector returned by the function
+ *  "getAllAvailablePortName()"
 */
 int Model::changePort(uint16_t port_index){
     if(serial_port->isOpen())
@@ -54,43 +101,65 @@ int Model::changePort(uint16_t port_index){
     emit portChanged(false);
     emit updateStateLights(false);
     return 0;
-
 }
 
-std::vector<uint32_t> Model::getCommonBaudRates()
+
+
+bool Model::changeBaudRate(uint8_t index)
 {
-    return {110, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 38400, 57600, 115200, 128000, 256000};
+    if(serial_port->setBaudRate(getCommonBaudRates()[index]))
+        return true;
+    else{
+        QString mes = "Error while changing port '" + serial_port->portName() + "' baud rate\nError description: " + serial_port->errorString();
+        qDebug() << mes;
+        emit emitAddText(mes);
+        return false;
+    }
 }
+
+
 
 bool Model::changeDataBits(uint8_t new_value)
 {
-    return serial_port->setDataBits(QSerialPort::DataBits(new_value));
+    if(serial_port->setDataBits(QSerialPort::DataBits(new_value))){
+        return true;
+    }else{
+        QString mes = "Error while changing port '" + serial_port->portName() + "' data bits\nError description: " + serial_port->errorString();
+        qDebug() << mes;
+        emit emitAddText(mes);
+        return false;
+    }
 }
+
+
 
 bool Model::changeParity(uint8_t index)
 {
-    return serial_port->setParity( index == 0 ? QSerialPort::Parity(index) : QSerialPort::Parity(index + 1) );
+    if(serial_port->setParity( index == 0 ? QSerialPort::Parity(index) : QSerialPort::Parity(index + 1) ) ){
+        return true;
+    }else{
+        QString mes = "Error while changing port '" + serial_port->portName() + "' parity\nError description: " + serial_port->errorString();
+        qDebug() << mes;
+        emit emitAddText(mes);
+        return false;
+    }
 }
 
-std::vector<QString> Model::getPossibleParity()
-{
-    return {"Parity None", "Parity Odd", "Parity Even", "Parity Mark", "Parity Space"};
-}
 
-std::vector<QString> Model::getPossibleStopBits()
-{
-    return {"One Stop", "Two Stop", "One and half Stop"};
-}
 
 bool Model::changeStopBits(uint8_t index)
 {
-    return serial_port->setStopBits(QSerialPort::StopBits(index));
+    if( serial_port->setStopBits(QSerialPort::StopBits(index)) ){
+        return true;
+    }else{
+        QString mes = "Error while changing port '" + serial_port->portName() + "' stop bits\nError description: " + serial_port->errorString();
+        qDebug() << mes;
+        emit emitAddText(mes);
+        return false;
+    }
 }
 
-std::vector<QString> Model::getPossibleFlowControls()
-{
-    return {"No flow control", "Hardware flow control", "Software flow control"};
-}
+
 
 bool Model::changeFlowControl(uint8_t index)
 {
@@ -106,13 +175,20 @@ bool Model::changeFlowControl(uint8_t index)
         f = QSerialPort::FlowControl::SoftwareControl;
         break;
     }
-    return serial_port->setFlowControl(f);
+    if( serial_port->setFlowControl(f) ){
+        return true;
+    }else{
+        QString mes = "Error while changing port '" + serial_port->portName() + "' flow control\nError description: " + serial_port->errorString();
+        qDebug() << mes;
+        emit emitAddText(mes);
+        return false;
+    }
 }
 
-bool Model::isPortOpen()
-{
-    return serial_port->isOpen();
-}
+
+
+
+
 
 bool Model::openClosePort(bool open)
 {
@@ -135,117 +211,13 @@ bool Model::openClosePort(bool open)
     }
 }
 
-bool Model::changeBaudRate(uint8_t index)
+
+
+bool Model::isPortOpen()
 {
-    if(serial_port->setBaudRate(getCommonBaudRates()[index]))
-        return true;
-    else{
-        QString mes = "Error while changing port '" + serial_port->portName() + "' baud rate\nError description: " + serial_port->errorString();
-        qDebug() << mes;
-        emit emitAddText(mes);
-        return false;
-    }
+    return serial_port->isOpen();
 }
 
-
-
-void Model::changeXZoom(int32_t zoom)
-{
-    zoom/=10;
-
-    axis_zoom[0] = zoom;
-    emit updateAxis();
-}
-
-void Model::changeYZoom(int32_t zoom)
-{
-    zoom/=10;
-
-    axis_zoom[1] = zoom;
-    emit updateAxis();
-}
-
-std::vector<double> Model::getXAxisLimits()
-{
-    return {axis_limits[0][0], axis_limits[0][1]};
-}
-
-std::vector<double> Model::getYAxisLimits()
-{
-    return {axis_limits[1][0], axis_limits[1][1]};
-}
-
-std::vector<double> Model::getZoomedXAxisLimits()
-{
-    if(axis_limits[0][0] + axis_zoom[0]*abs(axis_limits[0][0] - axis_limits[0][1]) < axis_limits[0][1] - axis_zoom[0]*abs(axis_limits[0][0] - axis_limits[0][1]))
-        return {axis_limits[0][0] + axis_zoom[0]*abs(axis_limits[0][0] - axis_limits[0][1]), axis_limits[0][1] - axis_zoom[0]*abs(axis_limits[0][0] - axis_limits[0][1])};
-    else
-        return {(axis_limits[0][0] + axis_limits[0][1])/2 - MIN_DISTANCE_BETWEEN_AXIS_LIMITS, (axis_limits[0][0] + axis_limits[0][1])/2 + MIN_DISTANCE_BETWEEN_AXIS_LIMITS};
-}
-
-std::vector<double> Model::getZoomedYAxisLimits()
-{
-    if(axis_limits[1][0] + axis_zoom[1]*abs(axis_limits[1][1] - axis_limits[1][0]) < axis_limits[1][1] - axis_zoom[1]*abs(axis_limits[1][1] - axis_limits[1][0]))
-        return {axis_limits[1][0] + axis_zoom[1]*abs(axis_limits[1][1] - axis_limits[1][0]), axis_limits[1][1] - axis_zoom[1]*abs(axis_limits[1][1] - axis_limits[1][0])};
-    else
-        return {(axis_limits[1][0] + axis_limits[1][1])/2 - MIN_DISTANCE_BETWEEN_AXIS_LIMITS, (axis_limits[1][0] + axis_limits[1][1])/2 + MIN_DISTANCE_BETWEEN_AXIS_LIMITS};
-}
-
-std::vector<double> Model::getAxisZoom()
-{
-    return {axis_zoom[0], axis_zoom[1]};
-}
-
-
-/*
- *changeXLimits(double, double)
- *  this function check all the required condition before calling the function
- *  modifyXLimits(double, double);
-*/
-
-void Model::changeXLimits(double new_min, double new_max)
-{
-    if(!plot_following && !see_whole_curve)
-        modifyXLimits(new_min, new_max);
-}
-
-
-
-/*
- *changeYLimits(double, double)
- *  this function check all the required condition before calling the function
- *  modifyYLimits(double, double);
-*/
-void Model::changeYLimits(double new_min, double new_max)
-{
-    if(!plot_following && !see_whole_curve)
-        modifyYLimits(new_min, new_max);
-}
-
-void Model::zoomIn()
-{
-    if(axis_zoom[0] > zoom_limits[1] || axis_zoom[1] > zoom_limits[1])
-        return;
-    axis_zoom[0]++;
-    axis_zoom[1]++;
-    emit updateAxis();
-    emit updateGraphControls();
-}
-
-void Model::zoomOut()
-{
-    if(axis_zoom[0] < zoom_limits[0] || axis_zoom[1] < zoom_limits[0])
-        return;
-    axis_zoom[0]--;
-    axis_zoom[1]--;
-    emit updateAxis();
-    emit updateGraphControls();
-}
-
-std::vector<int32_t> Model::getZoomLimits()
-{
-    return {zoom_limits[0], zoom_limits[1]};
-}
 
 
 void Model::getNewValueFromSerialPort()
@@ -267,7 +239,7 @@ void Model::getNewValueFromSerialPort()
 
 
         QPointF value( data.mid(_tmp_index + 1, data.indexOf(";", _tmp_index) - _tmp_index - 1).toDouble(),
-                     data.mid(data.indexOf(";", _tmp_index) + 1, data.indexOf("$£", _tmp_index) - data.indexOf(";", _tmp_index) - 1).toDouble());
+                      data.mid(data.indexOf(";", _tmp_index) + 1, data.indexOf("$£", _tmp_index) - data.indexOf(";", _tmp_index) - 1).toDouble());
 
         lines.push_back(value);
         emit updateLine();
@@ -281,31 +253,7 @@ void Model::getNewValueFromSerialPort()
     }
 }
 
-void Model::modifyXLimits(double new_min, double new_max)
-{
-    if(new_max - new_min >= MIN_DISTANCE_BETWEEN_AXIS_LIMITS){
-        axis_limits[0][0] = new_min;
-        axis_limits[0][1] = new_max;
-        emit updateAxis();
-    }
-}
 
-void Model::modifyYLimits(double new_min, double new_max)
-{
-    if(new_max - new_min >= MIN_DISTANCE_BETWEEN_AXIS_LIMITS){
-        axis_limits[1][0] = new_min;
-        axis_limits[1][1] = new_max;
-        emit updateAxis();
-    }
-}
-
-void Model::follow_plot()
-{
-    if(lines.size() == 0)
-        return;
-    modifyXLimits(lines.at(lines.size()-1).x() + (axis_limits[0][1] - axis_limits[0][0])*OFFSET_PLOT_FOLLOW - (axis_limits[0][1] - axis_limits[0][0]), lines.at(lines.size()-1).x() + (axis_limits[1] - axis_limits[0])*OFFSET_PLOT_FOLLOW);
-    modifyYLimits(lines.at(lines.size()-1).y() - (axis_limits[1][1] - axis_limits[1][0])/2, lines.at(lines.size()-1).y() + (axis_limits[1][1] - axis_limits[1][0])/2);
-}
 
 bool Model::writeSerialData(QString s)
 {
@@ -327,6 +275,155 @@ bool Model::writeSerialData(QString s)
     }
 }
 
+
+
+void Model::changeXZoom(int32_t zoom)
+{
+    axis_zoom[0] = zoom;
+    emit updateAxis();
+}
+
+
+
+void Model::changeYZoom(int32_t zoom)
+{
+    axis_zoom[1] = zoom;
+    emit updateAxis();
+}
+
+
+
+void Model::zoomIn()
+{
+    if(axis_zoom[0] > zoom_limits[1] || axis_zoom[1] > zoom_limits[1])
+        return;
+    axis_zoom[0]++;
+    axis_zoom[1]++;
+    emit updateAxis();
+    emit updateGraphControls();
+}
+
+
+
+void Model::zoomOut()
+{
+    if(axis_zoom[0] < zoom_limits[0] || axis_zoom[1] < zoom_limits[0])
+        return;
+    axis_zoom[0]--;
+    axis_zoom[1]--;
+    emit updateAxis();
+    emit updateGraphControls();
+}
+
+
+
+std::vector<double> Model::getAxisZoom()
+{
+    return {axis_zoom[0], axis_zoom[1]};
+}
+
+
+
+std::vector<int32_t> Model::getZoomLimits()
+{
+    return {zoom_limits[0], zoom_limits[1]};
+}
+
+
+
+
+std::vector<double> Model::getXAxisLimits()
+{
+    return {axis_limits[0][0], axis_limits[0][1]};
+}
+
+
+
+std::vector<double> Model::getYAxisLimits()
+{
+    return {axis_limits[1][0], axis_limits[1][1]};
+}
+
+
+
+std::vector<double> Model::getZoomedXAxisLimits()
+{
+    if(axis_limits[0][0] + axis_zoom[0]*abs(axis_limits[0][0] - axis_limits[0][1]) < axis_limits[0][1] - axis_zoom[0]*abs(axis_limits[0][0] - axis_limits[0][1]))
+        return {axis_limits[0][0] + axis_zoom[0]*abs(axis_limits[0][0] - axis_limits[0][1]), axis_limits[0][1] - axis_zoom[0]*abs(axis_limits[0][0] - axis_limits[0][1])};
+    else
+        return {(axis_limits[0][0] + axis_limits[0][1])/2 - MIN_DISTANCE_BETWEEN_AXIS_LIMITS, (axis_limits[0][0] + axis_limits[0][1])/2 + MIN_DISTANCE_BETWEEN_AXIS_LIMITS};
+}
+
+
+
+std::vector<double> Model::getZoomedYAxisLimits()
+{
+    if(axis_limits[1][0] + axis_zoom[1]*abs(axis_limits[1][1] - axis_limits[1][0]) < axis_limits[1][1] - axis_zoom[1]*abs(axis_limits[1][1] - axis_limits[1][0]))
+        return {axis_limits[1][0] + axis_zoom[1]*abs(axis_limits[1][1] - axis_limits[1][0]), axis_limits[1][1] - axis_zoom[1]*abs(axis_limits[1][1] - axis_limits[1][0])};
+    else
+        return {(axis_limits[1][0] + axis_limits[1][1])/2 - MIN_DISTANCE_BETWEEN_AXIS_LIMITS, (axis_limits[1][0] + axis_limits[1][1])/2 + MIN_DISTANCE_BETWEEN_AXIS_LIMITS};
+}
+
+
+
+/*
+ *changeXLimits(double, double)
+ *  this function check all the required condition before calling the function
+ *  modifyXLimits(double, double);
+*/
+void Model::changeXLimits(double new_min, double new_max)
+{
+    if(!plot_following && !see_whole_curve)
+        modifyXLimits(new_min, new_max);
+}
+
+
+
+/*
+ *changeYLimits(double, double)
+ *  this function check all the required condition before calling the function
+ *  modifyYLimits(double, double);
+*/
+void Model::changeYLimits(double new_min, double new_max)
+{
+    if(!plot_following && !see_whole_curve)
+        modifyYLimits(new_min, new_max);
+}
+
+
+
+void Model::modifyXLimits(double new_min, double new_max)
+{
+    if(new_max - new_min >= MIN_DISTANCE_BETWEEN_AXIS_LIMITS){
+        axis_limits[0][0] = new_min;
+        axis_limits[0][1] = new_max;
+        emit updateAxis();
+    }
+}
+
+
+
+void Model::modifyYLimits(double new_min, double new_max)
+{
+    if(new_max - new_min >= MIN_DISTANCE_BETWEEN_AXIS_LIMITS){
+        axis_limits[1][0] = new_min;
+        axis_limits[1][1] = new_max;
+        emit updateAxis();
+    }
+}
+
+
+
+
+void Model::follow_plot()
+{
+    if(lines.size() == 0)
+        return;
+    modifyXLimits(lines.at(lines.size()-1).x() + (axis_limits[0][1] - axis_limits[0][0])*OFFSET_PLOT_FOLLOW - (axis_limits[0][1] - axis_limits[0][0]), lines.at(lines.size()-1).x() + (axis_limits[1] - axis_limits[0])*OFFSET_PLOT_FOLLOW);
+    modifyYLimits(lines.at(lines.size()-1).y() - (axis_limits[1][1] - axis_limits[1][0])/2, lines.at(lines.size()-1).y() + (axis_limits[1][1] - axis_limits[1][0])/2);
+}
+
+
 void Model::setPlotFollowing(bool value)
 {
     if(!value)
@@ -337,10 +434,13 @@ void Model::setPlotFollowing(bool value)
     }
 }
 
+
 bool Model::getPlotFollowing()
 {
     return plot_following;
 }
+
+
 
 void Model::setShowPoints(bool value)
 {
@@ -348,25 +448,13 @@ void Model::setShowPoints(bool value)
     emit showPointsChanged();
 }
 
+
 bool Model::getShowPoints()
 {
     return show_points;
 }
 
-void Model::setSeeWholeCurve(bool value)
-{
-    if(!value)
-        see_whole_curve = value;
-    else if(!plot_following){
-        see_whole_curve = value;
-        seeWholeCurve();
-    }
-}
 
-bool Model::getSeeWholeCurve()
-{
-    return see_whole_curve;
-}
 
 void Model::seeWholeCurve()
 {
@@ -391,4 +479,30 @@ void Model::seeWholeCurve()
     }
     modifyXLimits(min[0] - (max[0] - min[0])*0.8, max[0] + (max[0] - min[0])*1.2);
     modifyYLimits(min[1] - (max[1] - min[1])*0.8, max[1] + (max[1] - min[1])*1.2);
+}
+
+
+
+void Model::setSeeWholeCurve(bool value)
+{
+    if(!value)
+        see_whole_curve = value;
+    else if(!plot_following){
+        see_whole_curve = value;
+        seeWholeCurve();
+    }
+}
+
+
+bool Model::getSeeWholeCurve()
+{
+    return see_whole_curve;
+}
+
+
+
+void Model::clearLine()
+{
+    lines.clear();
+    emit refreshLine();
 }
