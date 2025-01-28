@@ -11,14 +11,14 @@ LineSeries {
     id: root
     property var graph
 
-    function setLabelToNull(){
-        Scripts.resetLabel()
-    }
-
     //Point showed in the line when the Model::show_points is true
     pointDelegate: Rectangle{
         id: marker
 
+        property int index
+        Component.onCompleted: {
+            index = root.count
+        }
         property bool clicked: false
 
         width: 16
@@ -49,14 +49,7 @@ LineSeries {
                         marker.color = Qt.darker(marker.color)
                         marker.border.color = Qt.darker(marker.border.color)
                         Scripts.destroyLabel()
-
-
-                        //this function wnats the parent of the
-                        //LabelPointCoordinates and an x and y value,
-                        //it gets them by accessing the graph PointRenderer child
-                        //and seeing at wich index is the point, once it know that
-                        //it access the point of the series at the index just found
-                        Scripts.createLabelPointCoordinates(mouse_area_marker, root.at(root.graph.children[1].children.indexOf(marker)-1).x, root.at(root.graph.children[1].children.indexOf(marker)-1).y)
+                        Scripts.createLabelPointCoordinates(mouse_area_marker, root.at(marker.index - 1).x, root.at(marker.index - 1).y)
                     }else{
                         marker.color = "#ffffff"
                         marker.border.color = "#000000"

@@ -1,13 +1,16 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include <QObject>
+
 #include <iostream>
+#include <string>
+#include <limits>
+#include <array>
+
+#include <QObject>
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
 #include <QDebug>
-#include <string>
-#include <limits>
 #include <QPoint>
 
 
@@ -24,7 +27,8 @@ public:
     explicit Model(QObject *parent = nullptr);
     ~Model();
 
-    Q_INVOKABLE inline std::vector<QPointF> getLine() {return lines;}
+    Q_INVOKABLE inline std::vector<QPointF> getLine(QString name) {return lines.at(name)->points;}
+    Q_INVOKABLE inline QString getLineColor(QString name) {return lines.at(name)->color;}
     Q_INVOKABLE void clearLine();
 
     Q_INVOKABLE static std::vector<QString> getAllAvailablePortName();
@@ -79,7 +83,17 @@ public:
     Q_INVOKABLE inline double getMinDistanceBetweenAxisLimits() const {return MIN_DISTANCE_BETWEEN_AXIS_LIMITS;}
 
 private:
-    std::vector<QPointF> lines;
+
+    struct Lines{
+        std::vector<QPointF> points;
+        QString name, color;
+    };
+
+    std::map<QString, Lines*> lines;
+
+    //The colors array dictate the maximum lines that the program can handle.
+    //so if you want to increase the possible lines just add some color in here
+    std::array<QString ,8> colors{"red", "pink", "orange", "yellow", "purple", "green", "blue", "brown"};
 
     QSerialPort* serial_port;
 
@@ -91,6 +105,9 @@ private:
     bool see_whole_curve = false;
     bool plot_following = true;
     bool show_points = false;
+
+
+    QString getNewLineColor();
 
     void modifyXLimits(double new_min, double new_max);
     void modifyYLimits(double new_min, double new_max);
@@ -110,7 +127,7 @@ signals:
     void updateAxis();
     void updateGraphControls();
 
-    void updateLine();
+    void updateLine(QString line_name);
     void refreshLine();
 
 public slots:

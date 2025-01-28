@@ -120,8 +120,9 @@ Item {
 
         GraphsView {
             id:graph
+
             anchors.fill: parent
-            anchors.margins: 16
+            anchors.margins: width/50
 
             theme: GraphsTheme {
                 readonly property color c1: "#ffffff"
@@ -131,6 +132,10 @@ Item {
                 colorScheme: GraphsTheme.ColorScheme.Dark
 
                 seriesColors: ["#2CDE85", "#DBEB00"]
+
+                property double grid_width: graph.width/760
+                grid.mainWidth: grid_width
+                grid.subWidth: grid_width/2
 
                 grid.mainColor: c3
                 grid.subColor: c2
@@ -161,13 +166,6 @@ Item {
                 subTickCount: 1
                 labelDecimals: 1
             }
-
-            CustomLineSeries {
-                id: line_series
-
-                graph: graph
-                width: graph.width/250
-            }
         }
     }
 
@@ -177,14 +175,19 @@ Item {
 
         property int i: 0
         property var points
+        property var g
 
         function onUpdateStateLights(state){
             state_light_close.color = state ? Qt.darker("red") : "red"
             state_light_open.color = state ? "green" : Qt.darker("green")
         }
 
-        function onUpdateLine(){
-            line_series.append(Model.getLine()[Model.getLine().length - 1].x, Model.getLine()[Model.getLine().length - 1].y)
+        function onUpdateLine(name){
+            if(Scripts.getLineSeries(name) === null){
+                Scripts.createLineSeries(graph, name, Model.getLineColor(name))
+                graph.addSeries(Scripts.getLineSeries(name))
+            }
+            Scripts.appendToLineSeries(name, Model.getLine(name)[Model.getLine(name).length - 1].x, Model.getLine(name)[Model.getLine(name).length - 1].y)
         }
 
         function onUpdateAxis(){

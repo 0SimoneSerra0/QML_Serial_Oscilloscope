@@ -13,6 +13,11 @@ Model::Model(QObject *parent)
 Model::~Model(){
     if(serial_port->isOpen())
         serial_port->close();
+
+    for(auto& l : lines){
+        delete l.second;
+        lines.erase(lines.find(l.first));
+    }
 }
 
 
@@ -235,14 +240,26 @@ void Model::getNewValueFromSerialPort()
     while(_index != std::string::npos){
         uint16_t _tmp_index = data.indexOf("/", _index);
 
-        //std::string _name = data.substr(_index, _tmp_index);  //for now is useless, but it will be important for a future update
-
+        QString _name = data.mid(_index, _tmp_index - _index);  //for now is useless, but it will be important for a future update
 
         QPointF value( data.mid(_tmp_index + 1, data.indexOf(";", _tmp_index) - _tmp_index - 1).toDouble(),
                       data.mid(data.indexOf(";", _tmp_index) + 1, data.indexOf("$£", _tmp_index) - data.indexOf(";", _tmp_index) - 1).toDouble());
 
-        lines.push_back(value);
-        emit updateLine();
+
+        if(lines.find(_name) == lines.end()){
+            if(lines.size() == colors.size()){
+                _index = data.indexOf("£$", _tmp_index);
+                continue;
+            }
+
+            Lines* _l = new Lines();
+            _l->name = _name;
+            _l->color = getNewLineColor();
+            lines.insert( std::pair<QString, Lines*>(_name, _l) );
+        }
+
+        lines.at(_name)->points.push_back(value);
+        emit updateLine(_name);
 
         _index = data.indexOf("£$", _tmp_index);
     }
@@ -414,13 +431,13 @@ void Model::modifyYLimits(double new_min, double new_max)
 
 
 
-
+//to modify, since lines is now a map
 void Model::follow_plot()
 {
     if(lines.size() == 0)
         return;
-    modifyXLimits(lines.at(lines.size()-1).x() + (axis_limits[0][1] - axis_limits[0][0])*OFFSET_PLOT_FOLLOW - (axis_limits[0][1] - axis_limits[0][0]), lines.at(lines.size()-1).x() + (axis_limits[1] - axis_limits[0])*OFFSET_PLOT_FOLLOW);
-    modifyYLimits(lines.at(lines.size()-1).y() - (axis_limits[1][1] - axis_limits[1][0])/2, lines.at(lines.size()-1).y() + (axis_limits[1][1] - axis_limits[1][0])/2);
+    //modifyXLimits(lines.at(lines.size()-1).x() + (axis_limits[0][1] - axis_limits[0][0])*OFFSET_PLOT_FOLLOW - (axis_limits[0][1] - axis_limits[0][0]), lines.at(lines.size()-1).x() + (axis_limits[1] - axis_limits[0])*OFFSET_PLOT_FOLLOW);
+    //modifyYLimits(lines.at(lines.size()-1).y() - (axis_limits[1][1] - axis_limits[1][0])/2, lines.at(lines.size()-1).y() + (axis_limits[1][1] - axis_limits[1][0])/2);
 }
 
 
@@ -455,30 +472,30 @@ bool Model::getShowPoints()
 }
 
 
-
+//to modify, since now lines is a map
 void Model::seeWholeCurve()
 {
     if(lines.size() == 0)
         return;
-    double min[2] = {0,0};
-    double max[2] = {0,0};
-    min[0] = lines.at(0).x();
-    min[1] = lines.at(0).y();
-    max[0] = lines.at(0).x();
-    max[1] = lines.at(0).y();
-    for(QPointF p : lines){
-        if(p.x() < min[0])
-            min[0] = p.x();
-        else if(p.x() > max[0])
-            max[0] = p.x();
+    // double min[2] = {0,0};
+    // double max[2] = {0,0};
+    // min[0] = lines.at(0).x();
+    // min[1] = lines.at(0).y();
+    // max[0] = lines.at(0).x();
+    // max[1] = lines.at(0).y();
+    // for(QPointF p : lines){
+    //     if(p.x() < min[0])
+    //         min[0] = p.x();
+    //     else if(p.x() > max[0])
+    //         max[0] = p.x();
 
-        if(p.y() < min[1])
-            min[1] =p.y();
-        else if(p.y() > max[1])
-            max[1] = p.y();
-    }
-    modifyXLimits(min[0] - (max[0] - min[0])*0.8, max[0] + (max[0] - min[0])*1.2);
-    modifyYLimits(min[1] - (max[1] - min[1])*0.8, max[1] + (max[1] - min[1])*1.2);
+    //     if(p.y() < min[1])
+    //         min[1] =p.y();
+    //     else if(p.y() > max[1])
+    //         max[1] = p.y();
+    // }
+    // modifyXLimits(min[0] - (max[0] - min[0])*0.8, max[0] + (max[0] - min[0])*1.2);
+    // modifyYLimits(min[1] - (max[1] - min[1])*0.8, max[1] + (max[1] - min[1])*1.2);
 }
 
 
@@ -500,9 +517,18 @@ bool Model::getSeeWholeCurve()
 }
 
 
-
+//to modify, since lines is now a map
 void Model::clearLine()
 {
     lines.clear();
     emit refreshLine();
+}
+
+
+QString Model::getNewLineColor()
+{
+    if(lines.size() >= colors.size())
+        return "";
+
+    return colors[lines.size() - 1];
 }
