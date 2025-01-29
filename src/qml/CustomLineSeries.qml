@@ -21,8 +21,8 @@ LineSeries {
         }
         property bool clicked: false
 
-        width: 16
-        height: 16
+        width: root.width * 4
+        height: width
         border.width: 4
         radius: width/2
 

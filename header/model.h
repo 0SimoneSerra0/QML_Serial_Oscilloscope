@@ -80,6 +80,10 @@ public:
     Q_INVOKABLE void setSeeWholeCurve(bool value);
     Q_INVOKABLE bool getSeeWholeCurve();
 
+    Q_INVOKABLE void setSelectedLine(QString line_name);
+    Q_INVOKABLE QString getSelectedLine();
+
+
     Q_INVOKABLE inline double getMinDistanceBetweenAxisLimits() const {return MIN_DISTANCE_BETWEEN_AXIS_LIMITS;}
 
 private:
@@ -90,6 +94,7 @@ private:
     };
 
     std::map<QString, Lines*> lines;
+    QString selected_line;
 
     //The colors array dictate the maximum lines that the program can handle.
     //so if you want to increase the possible lines just add some color in here
@@ -103,7 +108,7 @@ private:
     double axis_zoom[2] = {0, 0};
 
     bool see_whole_curve = false;
-    bool plot_following = true;
+    bool plot_following = false;
     bool show_points = false;
 
 
@@ -112,7 +117,7 @@ private:
     void modifyXLimits(double new_min, double new_max);
     void modifyYLimits(double new_min, double new_max);
 
-    void follow_plot();
+    void followPlot();
     void seeWholeCurve();
 
 signals:
@@ -128,6 +133,8 @@ signals:
     void updateGraphControls();
 
     void updateLine(QString line_name);
+    void lineAdded(QString line_name);
+    void selectedLineChanged();
     void refreshLine();
 
 public slots:

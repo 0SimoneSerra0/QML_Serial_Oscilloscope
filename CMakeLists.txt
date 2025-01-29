@@ -30,6 +30,7 @@ QML_FILES
     src/qml/scripts.js
     src/qml/SerialIOInterface.qml
     src/qml/SerialPortOption.qml
+    QML_FILES src/qml/LineSelectorElement.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

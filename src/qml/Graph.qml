@@ -2,6 +2,7 @@ import QtQuick
 import QtGraphs
 import MyModel
 import QtQuick.Controls
+import QtQuick.Layouts
 import "scripts.js" as Scripts
 
 Item {
@@ -118,62 +119,73 @@ Item {
             }
         }
 
-        GraphsView {
-            id:graph
+        RowLayout{
+            id: layout_line_selector
 
-            anchors.fill: parent
-            anchors.margins: width/50
+            x: state_light_open.x + state_light_open.width*2
+            y: graph_bg.height - height*0.9
 
-            theme: GraphsTheme {
-                readonly property color c1: "#ffffff"
-                readonly property color c2: "#000000"
-                readonly property color c3: Qt.lighter(c2, 1.5)
-
-                colorScheme: GraphsTheme.ColorScheme.Dark
-
-                seriesColors: ["#2CDE85", "#DBEB00"]
-
-                property double grid_width: graph.width/760
-                grid.mainWidth: grid_width
-                grid.subWidth: grid_width/2
-
-                grid.mainColor: c3
-                grid.subColor: c2
-                axisX.mainColor: c3
-                axisY.mainColor: c3
-                axisX.subColor: c2
-                axisY.subColor: c2
-                axisX.labelTextColor: c1
-                axisY.labelTextColor: c1
-            }
-
-            axisX: ValueAxis {
-                id:x_axis
-
-                min: -5
-                max: 5
-                tickInterval: 1
-                subTickCount: 1
-                labelDecimals: 1
-            }
-
-            axisY: ValueAxis {
-                id:y_axis
-
-                min: -5
-                max: 5
-                tickInterval: 1
-                subTickCount: 1
-                labelDecimals: 1
-            }
+            width: graph_bg.width - x
+            height: graph_bg.height - graph.y - graph.height
         }
     }
+
+
+    GraphsView{
+        id:graph
+
+        anchors.fill: parent
+        anchors.margins: width/50
+
+        theme: GraphsTheme {
+            readonly property color c1: "#ffffff"
+            readonly property color c2: "#000000"
+            readonly property color c3: Qt.lighter(c2, 1.5)
+
+            colorScheme: GraphsTheme.ColorScheme.Dark
+
+            seriesColors: ["#2CDE85", "#DBEB00"]
+
+            property double grid_width: graph.width/760
+            grid.mainWidth: grid_width
+            grid.subWidth: grid_width/2
+
+            grid.mainColor: c3
+            grid.subColor: c2
+            axisX.mainColor: c3
+            axisY.mainColor: c3
+            axisX.subColor: c2
+            axisY.subColor: c2
+            axisX.labelTextColor: c1
+            axisY.labelTextColor: c1
+        }
+
+        axisX: ValueAxis {
+            id:x_axis
+
+            min: -5
+            max: 5
+            tickInterval: 1
+            subTickCount: 1
+            labelDecimals: 1
+        }
+
+        axisY: ValueAxis {
+            id:y_axis
+
+            min: -5
+            max: 5
+            tickInterval: 1
+            subTickCount: 1
+            labelDecimals: 1
+        }
+    }
+
 
     //handle all the intrested signal from the Model
     Connections{
         target: Model
 
-        property int i: 0
         property var points
         property var g
 
@@ -201,12 +213,28 @@ Item {
         }
 
         function onRefreshLine(){
-            line_series.clear()
-            line_series.setLabelToNull()
-            points = Model.getLine()
-            for(i = 0; i < points.length; i+=1){
-                line_series.append(points[i].x(), points[i].y())
+            var s = Model.getSelectedLine()
+
+            if(s === "All"){
+                for(let [name, series] of Scripts.getAllLineSeries()){
+                    series.clear()
+                    points = Model.getLine(name)
+                    for(var i = 0; i < points.length; i+=1){
+                        series.append(points[i].x(), points[i].y())
+                    }
+                }
+            }else{
+                Scripts.getLineSeries(s).clear()
+                points = Model.getLine(s)
+                for(i = 0; i < points.length; i+=1){
+                    Scripts.getLineSeries(s).append(points[i].x(), points[i].y())
+                }
             }
+        }
+
+        function onLineAdded(line_name){
+            Scripts.createLineSelectorElement(layout_line_selector, line_name, Qt.lighter(root.color), "#afafaf", Model.getLineColor(line_name))
         }
     }
 }
+

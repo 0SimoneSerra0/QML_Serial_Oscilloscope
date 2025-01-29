@@ -69,12 +69,10 @@ function createLineSeries(parent, name, color) {
 function finishLineSeriesCreation() {
     if (component_line_series.status === Component.Ready) {
         line_series = component_line_series.createObject(parent_line_series, {name: _name, graph: parent_line_series, color: _color, width: 4});
-        console.log(line_series)
 
         if (line_series === null) {
             console.log("Error creating object");
         }else{
-            console.log(line_series)
             all_line_series.set(_name, line_series)
         }
     } else if (component_line_series.status === Component.Error) {
@@ -93,4 +91,56 @@ function getLineSeries(name){
 
 function appendToLineSeries(name, x, y){
     all_line_series.get(name).append(x, y)
+}
+
+function getAllLineSeries(){
+    return all_line_series
+}
+
+
+
+
+
+var component_line_selector
+var line_selector
+var parent_ls
+var name_ls
+var bg_color_ls
+var text_color_ls
+var line_color_ls
+var all_line_selectors = []
+
+function createLineSelectorElement(parent, line_name, bg_color, text_color, line_color, creatingFirst = false){
+
+    if(!creatingFirst && all_line_selectors.length == 0)
+        createLineSelectorElement(parent, "All", bg_color, text_color, Qt.rgba(0,0,0,0), true)
+
+    component_line_selector = Qt.createComponent("LineSelectorElement.qml")
+    parent_ls = parent
+    name_ls = line_name
+    bg_color_ls = bg_color
+    text_color_ls = text_color
+    line_color_ls = line_color
+
+    if(component_line_selector.status === Component.Ready){
+        finshLineSelectorCreation()
+    }else{
+        component_line_selector.statusChanged.connect(finshLineSelectorCreation)
+    }
+}
+
+
+function finshLineSelectorCreation(){
+    if (component_line_selector.status === Component.Ready) {
+
+        line_selector = component_line_selector.createObject(parent_ls, {height: parent_ls.height, line_name: name_ls, bg_color: bg_color_ls, text_color: text_color_ls, line_color: line_color_ls})
+
+        if (line_selector === null) {
+            console.log("Error creating object");
+        }else{
+            all_line_selectors.push(line_selector)
+        }
+    } else if (component_line_selector.status === Component.Error) {
+        console.log("Error loading component:", component_line_selector.errorString());
+    }
 }

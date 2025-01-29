@@ -46,7 +46,6 @@ Item {
         height: root.height
         color: root.text_color
 
-        property int i: 0
         property bool point: false
         property int init_char: 1
         property bool val_just_updated: false
@@ -78,7 +77,7 @@ Item {
                     }
                 }
 
-                for(i = init_char; i < text.length; i+=1){
+                for(var i = init_char; i < text.length; i+=1){
                     //it checks if the caracter at index i is valid (is a
                     //digit or a point if there isn't already anoter in the string)
                     if(!(text.charCodeAt(i) >= 48 && text.charCodeAt(i)<=57 || (text.charCodeAt(i) === 46 && !point))){

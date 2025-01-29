@@ -358,8 +358,8 @@ Item {
 
         border.width: width/10
 
-        color: Qt.darker(root.bg_color)
-        border.color: Qt.darker(color)
+        color: Qt.darker(Qt.darker(root.bg_color))
+        border.color: Qt.darker(Qt.darker(color))
 
         Shape{
             id: plot_following_symbol
@@ -373,7 +373,7 @@ Item {
                 id: shape_path_plot_following_symbol
 
                 strokeWidth: plot_following_btn.width/10
-                strokeColor: root.text_color
+                strokeColor: Qt.darker(root.text_color)
                 fillColor: Qt.rgba(0,0,0,0)
 
                 startX: plot_following_btn.width/5; startY: plot_following_btn.height/5
@@ -385,11 +385,14 @@ Item {
         MouseArea{
             id: mouse_area_plot_following_btn
 
+            property bool active: false
+
             anchors.fill: parent
 
             onClicked:{
                 Model.setPlotFollowing(!Model.getPlotFollowing())
-                if(Model.getPlotFollowing()){
+                active = Model.getPlotFollowing()
+                if(active){
                     plot_following_btn.color = Qt.darker(root.bg_color)
                     plot_following_btn.border.color = Qt.darker(plot_following_btn.color)
                     shape_path_plot_following_symbol.strokeColor = root.text_color
@@ -592,6 +595,17 @@ Item {
 
             dial_y_axis.value = Model.getAxisZoom()[1]
             spin_box_y_axis.value = dial_y_axis.value
+        }
+
+        function onSelectedLineChanged(){
+            if(Model.getSelectedLine() === "All" || Model.getSelectedLine() === ""){
+                if(mouse_area_plot_following_btn.active){
+                    plot_following_btn.color = Qt.darker(Qt.darker(root.bg_color))
+                    plot_following_btn.border.color = Qt.darker(Qt.darker(plot_following_btn.color))
+                    shape_path_plot_following_symbol.strokeColor = Qt.darker(root.text_color)
+                    mouse_area_plot_following_btn.active = Model.getPlotFollowing()
+                }
+            }
         }
     }
 }

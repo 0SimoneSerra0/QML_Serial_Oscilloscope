@@ -240,7 +240,7 @@ void Model::getNewValueFromSerialPort()
     while(_index != std::string::npos){
         uint16_t _tmp_index = data.indexOf("/", _index);
 
-        QString _name = data.mid(_index, _tmp_index - _index);  //for now is useless, but it will be important for a future update
+        QString _name = data.mid(_index + 2, _tmp_index - _index - 2);
 
         QPointF value( data.mid(_tmp_index + 1, data.indexOf(";", _tmp_index) - _tmp_index - 1).toDouble(),
                       data.mid(data.indexOf(";", _tmp_index) + 1, data.indexOf("$£", _tmp_index) - data.indexOf(";", _tmp_index) - 1).toDouble());
@@ -256,6 +256,8 @@ void Model::getNewValueFromSerialPort()
             _l->name = _name;
             _l->color = getNewLineColor();
             lines.insert( std::pair<QString, Lines*>(_name, _l) );
+
+            emit lineAdded(_name);
         }
 
         lines.at(_name)->points.push_back(value);
@@ -264,7 +266,7 @@ void Model::getNewValueFromSerialPort()
         _index = data.indexOf("£$", _tmp_index);
     }
     if(plot_following){
-        follow_plot();
+        followPlot();
     }else if(see_whole_curve){
         seeWholeCurve();
     }
@@ -431,13 +433,12 @@ void Model::modifyYLimits(double new_min, double new_max)
 
 
 
-//to modify, since lines is now a map
-void Model::follow_plot()
+void Model::followPlot()
 {
-    if(lines.size() == 0)
+    if(lines.find(selected_line) == lines.end() || lines[selected_line]->points.size() == 0)
         return;
-    //modifyXLimits(lines.at(lines.size()-1).x() + (axis_limits[0][1] - axis_limits[0][0])*OFFSET_PLOT_FOLLOW - (axis_limits[0][1] - axis_limits[0][0]), lines.at(lines.size()-1).x() + (axis_limits[1] - axis_limits[0])*OFFSET_PLOT_FOLLOW);
-    //modifyYLimits(lines.at(lines.size()-1).y() - (axis_limits[1][1] - axis_limits[1][0])/2, lines.at(lines.size()-1).y() + (axis_limits[1][1] - axis_limits[1][0])/2);
+    modifyXLimits(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).x() + (axis_limits[0][1] - axis_limits[0][0])*OFFSET_PLOT_FOLLOW - (axis_limits[0][1] - axis_limits[0][0]), lines[selected_line]->points.at(lines[selected_line]->points.size()-1).x() + (axis_limits[1] - axis_limits[0])*OFFSET_PLOT_FOLLOW);
+    modifyYLimits(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).y() - (axis_limits[1][1] - axis_limits[1][0])/2, lines[selected_line]->points.at(lines[selected_line]->points.size()-1).y() + (axis_limits[1][1] - axis_limits[1][0])/2);
 }
 
 
@@ -445,9 +446,9 @@ void Model::setPlotFollowing(bool value)
 {
     if(!value)
         plot_following = value;
-    else if(!see_whole_curve){
+    else if(!see_whole_curve && lines.find(selected_line) != lines.end()){
         plot_following = value;
-        follow_plot();
+        followPlot();
     }
 }
 
@@ -472,31 +473,88 @@ bool Model::getShowPoints()
 }
 
 
-//to modify, since now lines is a map
+/*
+ *seeWholeCurve()
+ *
+ *  IMPORTAT NOTE:
+ *  This program wants to be a generic data plot, so it isn't sure that the data will be plotted
+ *  as function of time. So the algorithm cant just see the first point of the series and the last
+ *  one for determine the plot border, but it has to search for the min and the max x and y values
+ *  in all the point of the vector
+*/
 void Model::seeWholeCurve()
 {
-    if(lines.size() == 0)
+    if(selected_line != "All" && (selected_line == "" || lines[selected_line]->points.size() == 0))
         return;
-    // double min[2] = {0,0};
-    // double max[2] = {0,0};
-    // min[0] = lines.at(0).x();
-    // min[1] = lines.at(0).y();
-    // max[0] = lines.at(0).x();
-    // max[1] = lines.at(0).y();
-    // for(QPointF p : lines){
-    //     if(p.x() < min[0])
-    //         min[0] = p.x();
-    //     else if(p.x() > max[0])
-    //         max[0] = p.x();
 
-    //     if(p.y() < min[1])
-    //         min[1] =p.y();
-    //     else if(p.y() > max[1])
-    //         max[1] = p.y();
-    // }
-    // modifyXLimits(min[0] - (max[0] - min[0])*0.8, max[0] + (max[0] - min[0])*1.2);
-    // modifyYLimits(min[1] - (max[1] - min[1])*0.8, max[1] + (max[1] - min[1])*1.2);
+
+    if(selected_line == "All"){
+        if(lines.size() == 0)
+            return;
+
+        double min[2] = {0,0};
+        double max[2] = {0,0};
+
+        bool only_empty_lines = true;
+
+        for(auto& pair : lines){
+            if(pair.second->points.size() == 0)
+                continue;
+
+            only_empty_lines = false;
+            min[0] = pair.second->points.at(0).x();
+            min[1] = pair.second->points.at(0).y();
+            max[0] = pair.second->points.at(0).x();
+            max[1] = pair.second->points.at(0).y();
+        }
+
+        if(only_empty_lines)
+            return;
+
+        for(auto& pair : lines){
+            if(pair.second->points.size() == 0)
+                continue;
+
+
+            for(QPointF p : pair.second->points){
+                if(p.x() < min[0])
+                    min[0] = p.x();
+                else if(p.x() > max[0])
+                    max[0] = p.x();
+
+                if(p.y() < min[1])
+                    min[1] =p.y();
+                else if(p.y() > max[1])
+                    max[1] = p.y();
+            }
+        }
+        modifyXLimits(min[0] - (max[0] - min[0])*0.8, max[0] + (max[0] - min[0])*1.2);
+        modifyYLimits(min[1] - (max[1] - min[1])*0.8, max[1] + (max[1] - min[1])*1.2);
+    }else{
+        double min[2] = {0,0};
+        double max[2] = {0,0};
+        min[0] = lines[selected_line]->points.at(0).x();
+        min[1] = lines[selected_line]->points.at(0).y();
+        max[0] = lines[selected_line]->points.at(0).x();
+        max[1] = lines[selected_line]->points.at(0).y();
+
+
+        for(QPointF p : lines[selected_line]->points){
+            if(p.x() < min[0])
+                min[0] = p.x();
+            else if(p.x() > max[0])
+                max[0] = p.x();
+
+            if(p.y() < min[1])
+                min[1] =p.y();
+            else if(p.y() > max[1])
+                max[1] = p.y();
+        }
+        modifyXLimits(min[0] - (max[0] - min[0])*0.8, max[0] + (max[0] - min[0])*1.2);
+        modifyYLimits(min[1] - (max[1] - min[1])*0.8, max[1] + (max[1] - min[1])*1.2);
+    }
 }
+
 
 
 
@@ -517,10 +575,49 @@ bool Model::getSeeWholeCurve()
 }
 
 
+
+void Model::setSelectedLine(QString line_name)
+{
+    //the functionality "plot_following" cant, obviusly, work with evrey or none of the line
+    //series, so if the user select All series or deselect every series the program has
+    //to check if "plot_following" was activated, and, if it was the case, deactivate it
+    if(line_name == "" || line_name == "All"){
+        selected_line = line_name;
+        setPlotFollowing(false);
+        emit selectedLineChanged();
+
+        return;
+    }else if(lines.find(line_name) != lines.end()){
+        selected_line = line_name;
+
+        emit selectedLineChanged();
+    }
+}
+
+
+QString Model::getSelectedLine()
+{
+    return selected_line;
+}
+
+
 //to modify, since lines is now a map
 void Model::clearLine()
 {
-    lines.clear();
+    if(selected_line == "")
+        return;
+
+    if(selected_line == "All"){
+        for(auto& p : lines){
+            p.second->points.clear();
+        }
+
+        emit refreshLine();
+        return;
+    }
+
+    lines[selected_line]->points.clear();
+
     emit refreshLine();
 }
 
