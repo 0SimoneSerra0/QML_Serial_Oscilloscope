@@ -241,6 +241,8 @@ void Model::getNewValueFromSerialPort()
         uint16_t _tmp_index = data.indexOf("/", _index);
 
         QString _name = data.mid(_index + 2, _tmp_index - _index - 2);
+        if(_name == "All" || _name == "")
+            continue;
 
         QPointF value( data.mid(_tmp_index + 1, data.indexOf(";", _tmp_index) - _tmp_index - 1).toDouble(),
                       data.mid(data.indexOf(";", _tmp_index) + 1, data.indexOf("$£", _tmp_index) - data.indexOf(";", _tmp_index) - 1).toDouble());
