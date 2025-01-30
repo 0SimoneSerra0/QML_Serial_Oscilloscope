@@ -17,6 +17,16 @@
 #define MIN_DISTANCE_BETWEEN_AXIS_LIMITS 0.0009
 #define OFFSET_PLOT_FOLLOW 0.1
 
+
+
+/*TO DO
+ *  - let the user change the axis limits (every one except the max x one) when the graph is in follow plot mode
+ *  - fix follow plot, so that it let constant the (max_x - min_x) difference
+ *  - let the user eliminate specifics series
+*/
+
+
+
 //PATTERN =  £$name/x_value;y_value$£
 
 class Model : public QObject
@@ -87,20 +97,20 @@ public:
     Q_INVOKABLE inline double getMinDistanceBetweenAxisLimits() const {return MIN_DISTANCE_BETWEEN_AXIS_LIMITS;}
 
 private:
-
     struct Lines{
         std::vector<QPointF> points;
         QString name, color;
     };
+
+
+    QSerialPort* serial_port;
 
     std::map<QString, Lines*> lines;
     QString selected_line;
 
     //The colors array dictate the maximum lines that the program can handle.
     //so if you want to increase the possible lines just add some color in here
-    std::array<QString ,8> colors{"red", "pink", "orange", "yellow", "purple", "green", "blue", "brown"};
-
-    QSerialPort* serial_port;
+    std::array<QString ,8> colors{"#ff4444", "#44ff44", "#4444ff", "#ffbf00", "#ff22ff", "#93c572", "adadad", "#a95c68"};
 
     double axis_limits[2][2] = {{0,10}, {0,10}};
 
@@ -110,7 +120,6 @@ private:
     bool see_whole_curve = false;
     bool plot_following = false;
     bool show_points = false;
-
 
     QString getNewLineColor();
 

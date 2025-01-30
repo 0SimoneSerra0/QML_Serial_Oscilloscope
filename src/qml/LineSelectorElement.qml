@@ -33,6 +33,7 @@ Item {
 
         height: root.height
         width: root.width - color_circle.width
+        radius: width/20
 
         color: root.bg_color
 

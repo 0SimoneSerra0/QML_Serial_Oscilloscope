@@ -268,11 +268,13 @@ Item {
         MouseArea{
             id: mouse_area_see_whole_curve_btn
 
+            property bool active: false
             anchors.fill: parent
 
             onClicked:{
                 Model.setSeeWholeCurve(!Model.getSeeWholeCurve())
-                if(Model.getSeeWholeCurve()){
+                active = Model.getSeeWholeCurve()
+                if(active){
                     see_whole_curve_btn.color = Qt.darker(root.bg_color)
                     see_whole_curve_btn.border.color = Qt.darker(see_whole_curve_btn.color)
                     symbol_see_whole_curve.border.color = root.text_color
@@ -604,6 +606,14 @@ Item {
                     plot_following_btn.border.color = Qt.darker(Qt.darker(plot_following_btn.color))
                     shape_path_plot_following_symbol.strokeColor = Qt.darker(root.text_color)
                     mouse_area_plot_following_btn.active = Model.getPlotFollowing()
+                }
+            }
+            if(Model.getSelectedLine() === ""){
+                if(mouse_area_see_whole_curve_btn.active){
+                    mouse_area_see_whole_curve_btn.active = false
+                    see_whole_curve_btn.color = Qt.darker(Qt.darker(root.bg_color))
+                    see_whole_curve_btn.border.color = Qt.darker(Qt.darker(see_whole_curve_btn.color))
+                    symbol_see_whole_curve.border.color = Qt.darker(root.text_color)
                 }
             }
         }

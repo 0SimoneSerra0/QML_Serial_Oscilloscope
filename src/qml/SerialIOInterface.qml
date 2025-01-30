@@ -164,7 +164,7 @@ Item {
             x: bg_input.border.width
             y: bg_input.border.width
 
-            width: parent.width//bg_input.width - bg_input.border.width*2
+            width: parent.width
             height: bg_input.height - bg_input.border.width*2
 
             contentWidth: bg_input.width
@@ -173,6 +173,7 @@ Item {
 
             TextArea{
                 id: text_area
+                property int max_text_length: 4000
 
                 property bool auto_scroll: true
 
@@ -200,8 +201,12 @@ Item {
         function onAppendSerialData(data){
             scroll_view.old_scroll_position = scroll_view.ScrollBar.vertical.position
             scroll_view.old_content_height = scroll_view.contentHeight
-            text_area.text += data
-            text_area.textChanged()
+            text_area.append(data)
+            if(text_area.text.length > text_area.max_text_length){
+                text_area.text = text_area.text.substr(text_area.text.length - text_area.max_text_length, text_area.max_text_length)
+                text_area.text = text_area.text.substr(text_area.text.indexOf("£$"))
+                text_area.textChanged()
+            }
         }
     }
 }

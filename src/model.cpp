@@ -1,5 +1,6 @@
 #include "header/model.h"
 
+
 Model::Model(QObject *parent)
     : QObject{parent}
 {
@@ -224,6 +225,27 @@ bool Model::isPortOpen()
 }
 
 
+bool Model::writeSerialData(QString s)
+{
+    if(!serial_port->isOpen()){
+        QString mes = "The selected port: '" + serial_port->portName() + "' is currently close so no data can be send to it\n\n";
+        qDebug() << mes;
+        emit emitAddText(mes);
+        return false;
+    }
+
+    serial_port->write(s.toStdString().c_str(), s.size());
+    if(serial_port->flush())
+        return true;
+    else{
+        QString mes = "Error encountered while trying to send the data\n\n";
+        qDebug() << mes;
+        emit emitAddText(mes);
+        return false;
+    }
+}
+
+
 
 void Model::getNewValueFromSerialPort()
 {
@@ -255,9 +277,10 @@ void Model::getNewValueFromSerialPort()
             }
 
             Lines* _l = new Lines();
+            lines.insert( std::pair<QString, Lines*>(_name, _l) );
+
             _l->name = _name;
             _l->color = getNewLineColor();
-            lines.insert( std::pair<QString, Lines*>(_name, _l) );
 
             emit lineAdded(_name);
         }
@@ -276,25 +299,6 @@ void Model::getNewValueFromSerialPort()
 
 
 
-bool Model::writeSerialData(QString s)
-{
-    if(!serial_port->isOpen()){
-        QString mes = "The selected port: '" + serial_port->portName() + "' is currently close so no data can be send to it\n\n";
-        qDebug() << mes;
-        emit emitAddText(mes);
-        return false;
-    }
-
-    serial_port->write(s.toStdString().c_str(), s.size());
-    if(serial_port->flush())
-        return true;
-    else{
-        QString mes = "Error encountered while trying to send the data\n\n";
-        qDebug() << mes;
-        emit emitAddText(mes);
-        return false;
-    }
-}
 
 
 
@@ -560,11 +564,13 @@ void Model::seeWholeCurve()
 
 
 
+
+
 void Model::setSeeWholeCurve(bool value)
 {
     if(!value)
         see_whole_curve = value;
-    else if(!plot_following){
+    else if(!plot_following && selected_line != ""){
         see_whole_curve = value;
         seeWholeCurve();
     }
@@ -583,11 +589,18 @@ void Model::setSelectedLine(QString line_name)
     //the functionality "plot_following" cant, obviusly, work with evrey or none of the line
     //series, so if the user select All series or deselect every series the program has
     //to check if "plot_following" was activated, and, if it was the case, deactivate it
-    if(line_name == "" || line_name == "All"){
+    if(line_name == ""){
+        selected_line = line_name;
+        setSeeWholeCurve(false);
+        setPlotFollowing(false);
+
+        emit selectedLineChanged();
+        return;
+    }else if(line_name == "All"){
         selected_line = line_name;
         setPlotFollowing(false);
-        emit selectedLineChanged();
 
+        emit selectedLineChanged();
         return;
     }else if(lines.find(line_name) != lines.end()){
         selected_line = line_name;
