@@ -58,10 +58,30 @@ Item {
                 onDownChanged:{
                     if(!down)
                         return
+                    if(count === Model.getAllAvailablePortName().length){
+                        var equal_models = true
+                        for(var i = 0; i < count; i+=1){
+                            if(valueAt(i) !== Model.getAllAvailablePortName().at(i)){
+                                equal_models = false
+                                break;
+                            }
+                        }
+                        if(equal_models){
+                            return;
+                        }
+                    }
+
                     var open_port = Model.isPortOpen()
-                    currentIndex = Model.getAllAvailablePortName().indexOf(valueAt(currentIndex))
+                    var p = valueAt(currentIndex)
                     model = Model.getAllAvailablePortName()
-                    currentIndexChanged()
+
+                    if(Model.getAllAvailablePortName().indexOf(p) === -1){
+                        open_port = false
+                        currentIndex = 0
+                    }else{
+                        currentIndex = Model.getAllAvailablePortName().indexOf(p)
+                    }
+                    Model.changePort(currentIndex)
                     Model.openClosePort(open_port)
                 }
             }
@@ -104,7 +124,7 @@ Item {
                 currentIndex: 6
 
                 onCurrentIndexChanged:{
-                    model.changeBaudRate(currentIndex)
+                    Model.changeBaudRate(currentIndex)
                 }
             }
         }
