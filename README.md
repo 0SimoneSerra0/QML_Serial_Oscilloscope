@@ -63,6 +63,9 @@ In order to identify the wanted data between all the other comunication this pro
 ![assets/Video1.gif](/assets/Video1.gif)
 
 <br>
+
+![assets/Video2.gif](/assets/Video2.gif)
+
 <br>
 <br>
 <br>
