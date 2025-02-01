@@ -29,15 +29,16 @@ In the actual version of the project the main feature are:
 - An interface for **writing** to, and **reading** from the serial port;
 - **Axis zoom**, that let the user go around in the graph while giving him an easy way to **come back** at the **initial point**;
 - Easy **graph movment** using the **mouse**, and wheel or **trackpad**, directly **on** the graph. All the displacment can be **manually set** and modified from an UI in the bottom left of the controls part;
-- An option that let the user **follow the plot**, one that makes **visible the whole curve**, another that makes the graph come back to the **initial condition** and one that **clear all the data** recived;
+- An option that let the user **follow the plot**, one that makes **visible the whole curve**, another that makes the graph come back to the **initial condition**, one that **clear all the data** recived and another that physically remove all the information recived of the selected series;
 - A virtual switch that **highlight** the actual **point** of the series. Each point is **clickable** and makes pop a litle dialog with its **coordinates**.
+- **Multi channeling**. The program can plot upto 8 curves of data on the same graph. This number is easely customizable by modifying the 'colors' array in src/model.h, because is its size that determine the max line series on the plot.
+- An interface to **select** a specific series or all the series. To use all the function of the program with each curve there is a litle list of clickable button just under the graph.
 <br>
 <br>
 <br>
 
 ## ToDo List
 - add an icon
-- Implement a way to handle multiple series plot and makes it coherent with all the other function;
 - making the UI look nicer.
 <br>
 <br>
@@ -47,7 +48,7 @@ In the actual version of the project the main feature are:
 The usage is very simple: **set the serial port** with its paramenter and **open** it, when the serial data arrives it will be plotted on the graph.
 In order to identify the wanted data between all the other comunication this program reads only a specific pattern:<br>
 **£$name/x_value;y_value$£**<br>
-At the moment the name part is useless but it will use in future version where there will be more lines at one time.
+**IMPORTANT**: there are only two invalid name, the first one il "All" and the last one is "". If you'll try to plot a series with this name the program will ignore it.
 <br>
 <br>
 <br>
@@ -55,7 +56,12 @@ At the moment the name part is useless but it will use in future version where t
 ## Screenshots
 ![Screenshot_2](https://github.com/user-attachments/assets/2a78e84e-53c4-440e-ab46-5149b56ebc33)
 <br>
-![Screenshot_1](https://github.com/user-attachments/assets/381b81fa-33e1-48d7-8f02-4d22b1b9045a)
+![Screen1](https://github.com/user-attachments/assets/b325f26d-6601-4874-b5e4-a618c46dda55)
+<br>
+![Video1](https://github.com/user-attachments/assets/acecc313-4731-4ef6-aa3a-edcb18b4d419)
+<br>
+![Video2](https://github.com/user-attachments/assets/47adcdc8-6f45-43c0-8655-e3e6fa2f0e86)
+<br>
 <br>
 <br>
 <br>
@@ -67,14 +73,19 @@ void setup() {
 }
 
 double x = 0;
-double y = sin(x);
+double _y1 = sin(x);
+double _y2 = cos(x);
 
 void loop() {
-  Serial.println("£$name/" + String(x) + ";" + String(y) + "$£");
+  Serial.println("£$Sin(x)/" + String(x) + ";" + String(_y1) + "$£");
+  Serial.println("£$Cos(x)/" + String(x) + ";" + String(_y2) + "$£");
 
-  x += 0.2;
-  y = sin(x);
-  delay(100);
+  x += 0.1;
+  _y1 = sin(x);
+  _y2 = cos(x);
+
+  delay(50);
 }
+
 
 ```
