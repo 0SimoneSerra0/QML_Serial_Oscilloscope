@@ -668,6 +668,8 @@ void Model::removeLine()
             p.second = nullptr;
         }
         lines.clear();
+        setPlotFollowing(false);
+        setSeeWholeCurve(false);
         selected_line = "";
         emit selectedLineChanged();
         return;
@@ -678,9 +680,9 @@ void Model::removeLine()
         lines[selected_line] = nullptr;
 
         lines.erase(lines.find(selected_line));
-        selected_line = "";
         setSeeWholeCurve(false);
         setPlotFollowing(false);
+        selected_line = "";
         emit selectedLineChanged();
     }
 }
