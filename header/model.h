@@ -16,7 +16,7 @@
 
 #define MIN_DISTANCE_BETWEEN_AXIS_LIMITS 0.0009
 #define OFFSET_SEE_WHOLE_CURVE 0.1
-
+#define ZOOM_CONSTANT 0.01
 
 
 //PATTERN =  £$name/x_value;y_value$£
@@ -103,7 +103,9 @@ private:
 
     //The colors array dictate the maximum lines that the program can handle.
     //so if you want to increase the possible lines just add some color in here
-    std::array<QString ,8> colors{"#ff4444", "#44ff44", "#4444ff", "#ffbf00", "#ff22ff", "#93c572", "adadad", "#a95c68"};
+    std::array<QString ,8> colors{"#ff4444", "#44ff44", "#4444ff",
+                                  "#ffbf00", "#ff22ff", "#93c572",
+                                  "adadad", "#a95c68"};
 
     double axis_limits[2][2] = {{-5,5}, {-5,5}};
 
@@ -118,6 +120,9 @@ private:
 
     void modifyXLimits(double new_min, double new_max);
     void modifyYLimits(double new_min, double new_max);
+
+    void modifyZoomedXLimits(double new_min, double new_max);
+    void modifyZoomedYLimits(double new_min, double new_max);
 
     void followPlot();
     void seeWholeCurve();
@@ -139,6 +144,9 @@ signals:
     void refreshLine();
 
     void lineRemoved(QString line_name);
+
+    void plotFollowingChanged();
+    void seeWholeCurveChanged();
 
 public slots:
     void getNewValueFromSerialPort();

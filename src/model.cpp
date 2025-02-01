@@ -372,20 +372,28 @@ std::vector<double> Model::getYAxisLimits()
 
 std::vector<double> Model::getZoomedXAxisLimits()
 {
-    if(axis_limits[0][0] + axis_zoom[0]*abs(axis_limits[0][0] - axis_limits[0][1]) < axis_limits[0][1] - axis_zoom[0]*abs(axis_limits[0][0] - axis_limits[0][1]))
-        return {axis_limits[0][0] + axis_zoom[0]*abs(axis_limits[0][0] - axis_limits[0][1]), axis_limits[0][1] - axis_zoom[0]*abs(axis_limits[0][0] - axis_limits[0][1])};
-    else
-        return {(axis_limits[0][0] + axis_limits[0][1])/2 - MIN_DISTANCE_BETWEEN_AXIS_LIMITS, (axis_limits[0][0] + axis_limits[0][1])/2 + MIN_DISTANCE_BETWEEN_AXIS_LIMITS};
+    double min = axis_limits[0][0] + (ZOOM_CONSTANT*axis_zoom[0])*(axis_limits[0][1] - axis_limits[0][0]);
+    double max = axis_limits[0][1] - (ZOOM_CONSTANT*axis_zoom[0])*(axis_limits[0][1] - axis_limits[0][0]);
+
+    if(min < max - MIN_DISTANCE_BETWEEN_AXIS_LIMITS){
+        return {min, max};
+    }else
+        return {(axis_limits[0][0] + axis_limits[0][1])/2 - MIN_DISTANCE_BETWEEN_AXIS_LIMITS,
+                (axis_limits[0][0] + axis_limits[0][1])/2 + MIN_DISTANCE_BETWEEN_AXIS_LIMITS};
 }
 
 
 
 std::vector<double> Model::getZoomedYAxisLimits()
 {
-    if(axis_limits[1][0] + axis_zoom[1]*abs(axis_limits[1][1] - axis_limits[1][0]) < axis_limits[1][1] - axis_zoom[1]*abs(axis_limits[1][1] - axis_limits[1][0]))
-        return {axis_limits[1][0] + axis_zoom[1]*abs(axis_limits[1][1] - axis_limits[1][0]), axis_limits[1][1] - axis_zoom[1]*abs(axis_limits[1][1] - axis_limits[1][0])};
-    else
-        return {(axis_limits[1][0] + axis_limits[1][1])/2 - MIN_DISTANCE_BETWEEN_AXIS_LIMITS, (axis_limits[1][0] + axis_limits[1][1])/2 + MIN_DISTANCE_BETWEEN_AXIS_LIMITS};
+    double min = axis_limits[1][0] + (ZOOM_CONSTANT*axis_zoom[1])*(axis_limits[1][1] - axis_limits[1][0]);
+    double max = axis_limits[1][1] - (ZOOM_CONSTANT*axis_zoom[1])*(axis_limits[1][1] - axis_limits[1][0]);
+
+    if(min < max - MIN_DISTANCE_BETWEEN_AXIS_LIMITS){
+        return {min, max};
+    }else
+        return {(axis_limits[1][0] + axis_limits[1][1])/2 - MIN_DISTANCE_BETWEEN_AXIS_LIMITS,
+                (axis_limits[1][0] + axis_limits[1][1])/2 + MIN_DISTANCE_BETWEEN_AXIS_LIMITS};
 }
 
 
@@ -398,13 +406,15 @@ std::vector<double> Model::getZoomedYAxisLimits()
 void Model::changeXLimits(double new_min, double new_max)
 {
     if(plot_following)
-        if(lines[selected_line]->points.size() > 0)
-            modifyXLimits(new_min < lines[selected_line]->points.at(lines[selected_line]->points.size() - 1).x() ? new_min : axis_limits[0][0], new_max > lines[selected_line]->points.at(lines[selected_line]->points.size() - 1).x() ? new_max : axis_limits[0][1]);
-        else
+        if(lines[selected_line]->points.size() > 0){
+            //IMPORTANT: if you modify the zoom system you also havo to modify the next line
+            double zoom = (ZOOM_CONSTANT*axis_zoom[0])*(axis_limits[0][1] - axis_limits[0][0]);
+            modifyXLimits(new_min < lines[selected_line]->points.at(lines[selected_line]->points.size() - 1).x() - zoom? new_min : lines[selected_line]->points.at(lines[selected_line]->points.size() - 1).x() - zoom,
+                          new_max > lines[selected_line]->points.at(lines[selected_line]->points.size() - 1).x() + zoom? new_max : lines[selected_line]->points.at(lines[selected_line]->points.size() - 1).x() + zoom);
+        }else
             modifyXLimits(new_min, new_max);
     else if(!see_whole_curve)
         modifyXLimits(new_min, new_max);
-
 }
 
 
@@ -418,7 +428,7 @@ void Model::changeYLimits(double new_min, double new_max)
 {
     if(plot_following)
         if(lines[selected_line]->points.size() > 0)
-            modifyYLimits(new_min < lines[selected_line]->points.at(lines[selected_line]->points.size() - 1).y() ? new_min : axis_limits[1][0], new_max > lines[selected_line]->points.at(lines[selected_line]->points.size() - 1).y() ? new_max : axis_limits[1][1]);
+            modifyYLimits(new_min + (ZOOM_CONSTANT*axis_zoom[1])*(axis_limits[1][1] - axis_limits[1][0]) < lines[selected_line]->points.at(lines[selected_line]->points.size() - 1).y() ? new_min : axis_limits[1][0], new_max + (ZOOM_CONSTANT*axis_zoom[1])*(axis_limits[1][1] - axis_limits[1][0]) > lines[selected_line]->points.at(lines[selected_line]->points.size() - 1).y() ? new_max : axis_limits[1][1]);
         else
             modifyYLimits(new_min, new_max);
     else if(!see_whole_curve)
@@ -449,31 +459,78 @@ void Model::modifyYLimits(double new_min, double new_max)
 
 
 
+void Model::modifyZoomedXLimits(double zoomed_min, double zoomed_max){
+    /*IMPORTANT:
+     * if you modify getZoomedXAxisLimits() you probably will hate to modify also the
+     * next lines. that equation are obtained from the system:
+     *
+     * { zoomed_min_value = DEZOOMED_MIN_VALUE - (_zoom*(DEZOOMED_MAX_VALUE - DEZOOMED_MIN_VALUE))
+     * { zoomed_max_value = DEZOOMED_MAX_VALUE + (_zoom*(DEZOOMED_MAX_VALUE - DEZOOMED_MIN_VALUE))
+    */
+    double _zoom = (ZOOM_CONSTANT*axis_zoom[0]);
+
+    if(_zoom == 1 || _zoom == 0)
+        _zoom += 0.0000001;
+
+    double dezoomed_max = (zoomed_max*(1 - _zoom) - _zoom*zoomed_min)/(1 - 2*_zoom);
+    double dezoomed_min = (zoomed_min - _zoom*dezoomed_max)/( 1 - _zoom );
+
+
+    modifyXLimits(dezoomed_min, dezoomed_max);
+}
+
+
+
+void Model::modifyZoomedYLimits(double zoomed_min, double zoomed_max)
+{
+    /*IMPORTANT:
+     * if you modify getZoomedYAxisLimits() you probably will hate to modify also the
+     * next three line. that equation are obtained from the system:
+     *
+     * { zoomed_min_value = DEZOOMED_MIN_VALUE - (_zoom*(DEZOOMED_MAX_VALUE - DEZOOMED_MIN_VALUE))
+     * { zoomed_max_value = DEZOOMED_MAX_VALUE + (_zoom*(DEZOOMED_MAX_VALUE - DEZOOMED_MIN_VALUE))
+    */
+    double _zoom = (ZOOM_CONSTANT*axis_zoom[1]);
+
+    if(_zoom == 1 || _zoom == 0)
+        _zoom += 0.0000001;
+
+    double dezoomed_max = (zoomed_max*(1 - _zoom) - _zoom*zoomed_min)/(1 - 2*_zoom);
+    double dezoomed_min = (zoomed_min - _zoom*dezoomed_max)/( 1 - _zoom );
+
+
+    modifyYLimits(dezoomed_min, dezoomed_max);
+}
+
+
 void Model::followPlot()
 {
     if(lines[selected_line]->points.size() == 0 || lines.find(selected_line) == lines.end())
         return;
 
     if(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).x() > getZoomedXAxisLimits()[1])
-        modifyXLimits(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).x() - (axis_limits[0][1] - axis_limits[0][0]), lines[selected_line]->points.at(lines[selected_line]->points.size()-1).x());
+        modifyZoomedXLimits(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).x() - (getZoomedXAxisLimits()[1] - getZoomedXAxisLimits()[0]), lines[selected_line]->points.at(lines[selected_line]->points.size()-1).x());
     else if(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).x() < getZoomedXAxisLimits()[0])
-        modifyXLimits(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).x(), lines[selected_line]->points.at(lines[selected_line]->points.size()-1).x() + (axis_limits[1] - axis_limits[0]));
+        modifyZoomedXLimits(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).x(), lines[selected_line]->points.at(lines[selected_line]->points.size()-1).x() + (getZoomedXAxisLimits()[1] - getZoomedXAxisLimits()[0]));
 
 
     if(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).y() > getZoomedYAxisLimits()[1])
-        modifyYLimits(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).y() - (axis_limits[1][1] - axis_limits[1][0]), lines[selected_line]->points.at(lines[selected_line]->points.size()-1).y());
+        modifyZoomedYLimits(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).y() - (getZoomedYAxisLimits()[1] - getZoomedYAxisLimits()[0]), lines[selected_line]->points.at(lines[selected_line]->points.size()-1).y());
     else if(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).y() < getZoomedYAxisLimits()[0])
-        modifyYLimits(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).y(), lines[selected_line]->points.at(lines[selected_line]->points.size()-1).y() + (axis_limits[1][1] - axis_limits[1][0]));
-
+        modifyZoomedYLimits(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).y(), lines[selected_line]->points.at(lines[selected_line]->points.size()-1).y() + (getZoomedYAxisLimits()[1] - getZoomedYAxisLimits()[0]));
 }
 
 
 void Model::setPlotFollowing(bool value)
 {
-    if(!value)
+    if(!value){
         plot_following = value;
-    else if(!see_whole_curve && lines.find(selected_line) != lines.end()){
+        emit plotFollowingChanged();
+    }else if(lines.find(selected_line) != lines.end()){
+        if(see_whole_curve)
+            setSeeWholeCurve(false);
         plot_following = value;
+        emit plotFollowingChanged();
         followPlot();
     }
 }
@@ -554,8 +611,8 @@ void Model::seeWholeCurve()
                     max[1] = p.y();
             }
         }
-        modifyXLimits(min[0] - (max[0] - min[0])*OFFSET_SEE_WHOLE_CURVE, max[0] + (max[0] - min[0])*OFFSET_SEE_WHOLE_CURVE);
-        modifyYLimits(min[1] - (max[1] - min[1])*OFFSET_SEE_WHOLE_CURVE, max[1] + (max[1] - min[1])*OFFSET_SEE_WHOLE_CURVE);
+        modifyZoomedXLimits(min[0] - (max[0] - min[0])*OFFSET_SEE_WHOLE_CURVE, max[0] + (max[0] - min[0])*OFFSET_SEE_WHOLE_CURVE);
+        modifyZoomedYLimits(min[1] - (max[1] - min[1])*OFFSET_SEE_WHOLE_CURVE, max[1] + (max[1] - min[1])*OFFSET_SEE_WHOLE_CURVE);
     }else{
         double min[2] = {0,0};
         double max[2] = {0,0};
@@ -576,8 +633,8 @@ void Model::seeWholeCurve()
             else if(p.y() > max[1])
                 max[1] = p.y();
         }
-        modifyXLimits(min[0] - (max[0] - min[0])*OFFSET_SEE_WHOLE_CURVE, max[0] + (max[0] - min[0])*OFFSET_SEE_WHOLE_CURVE);
-        modifyYLimits(min[1] - (max[1] - min[1])*OFFSET_SEE_WHOLE_CURVE, max[1] + (max[1] - min[1])*OFFSET_SEE_WHOLE_CURVE);
+        modifyZoomedXLimits(min[0] - (max[0] - min[0])*OFFSET_SEE_WHOLE_CURVE, max[0] + (max[0] - min[0])*OFFSET_SEE_WHOLE_CURVE);
+        modifyZoomedYLimits(min[1] - (max[1] - min[1])*OFFSET_SEE_WHOLE_CURVE, max[1] + (max[1] - min[1])*OFFSET_SEE_WHOLE_CURVE);
     }
 }
 
@@ -588,10 +645,14 @@ void Model::seeWholeCurve()
 
 void Model::setSeeWholeCurve(bool value)
 {
-    if(!value)
+    if(!value){
         see_whole_curve = value;
-    else if(!plot_following && selected_line != ""){
+        emit seeWholeCurveChanged();
+    }else if(selected_line != ""){
+        if(plot_following)
+            setPlotFollowing(false);
         see_whole_curve = value;
+        emit seeWholeCurveChanged();
         seeWholeCurve();
     }
 }

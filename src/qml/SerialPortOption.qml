@@ -61,7 +61,7 @@ Item {
                     if(count === Model.getAllAvailablePortName().length){
                         var equal_models = true
                         for(var i = 0; i < count; i+=1){
-                            if(valueAt(i) !== Model.getAllAvailablePortName().at(i)){
+                            if(valueAt(i) !== Model.getAllAvailablePortName()[i]){
                                 equal_models = false
                                 break;
                             }
