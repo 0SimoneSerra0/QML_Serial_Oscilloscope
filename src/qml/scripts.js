@@ -68,7 +68,7 @@ function createLineSeries(parent, name, color) {
 
 function finishLineSeriesCreation() {
     if (component_line_series.status === Component.Ready) {
-        line_series = component_line_series.createObject(parent_line_series, {name: _name, graph: parent_line_series, color: _color, width: 4});
+        line_series = component_line_series.createObject(parent_line_series, {name: _name, color: _color, width: 4});
 
         if (line_series === null) {
             console.log("Error creating object");
