@@ -54,7 +54,6 @@ In order to identify the wanted data between all the other comunication this pro
 <br>
 
 ## Screenshots
-![Screenshot_2](https://github.com/user-attachments/assets/2a78e84e-53c4-440e-ab46-5149b56ebc33)
 <br>
 ![Screen1](https://github.com/user-attachments/assets/b325f26d-6601-4874-b5e4-a618c46dda55)
 <br>
