@@ -2,19 +2,11 @@
 //LabelPointCoordinates
 
 
-<<<<<<< HEAD
 var component_label
 var label = null
 var parent_label = null
 var _y = 0
 var _x = 0
-=======
-var component;
-var label = null;
-var _parent;
-var _y;
-var _x
->>>>>>> e6d2053 (Added comment and code rearranged)
 
 
 function createLabelPointCoordinates(parent, x, y) {
@@ -171,7 +163,6 @@ function eliminateLineSelector(name){
     if(name === "All"){
         for(var [n, l] of all_line_selectors){
             l.destroy()
-            console.log(l)
         }
         all_line_selectors = new Map()
     }else if(all_line_selectors.has(name)){

@@ -29,15 +29,10 @@ public:
     explicit Model(QObject *parent = nullptr);
     ~Model();
 
-<<<<<<< HEAD
     Q_INVOKABLE std::vector<QPointF> getLine(QString name);
     Q_INVOKABLE inline QString getLineColor(QString name) {return lines.at(name)->color;}
     Q_INVOKABLE void clearLine();
     Q_INVOKABLE void removeLine();
-=======
-    Q_INVOKABLE inline std::vector<QPointF> getLine() {return lines;}
-    Q_INVOKABLE void clearLine();
->>>>>>> e6d2053 (Added comment and code rearranged)
 
     Q_INVOKABLE static std::vector<QString> getAllAvailablePortName();
     Q_INVOKABLE static std::vector<uint32_t> getCommonBaudRates();
@@ -88,13 +83,10 @@ public:
     Q_INVOKABLE void setSeeWholeCurve(bool value);
     Q_INVOKABLE bool getSeeWholeCurve();
 
-<<<<<<< HEAD
     Q_INVOKABLE void setSelectedLine(QString line_name);
     Q_INVOKABLE QString getSelectedLine();
 
 
-=======
->>>>>>> e6d2053 (Added comment and code rearranged)
     Q_INVOKABLE inline double getMinDistanceBetweenAxisLimits() const {return MIN_DISTANCE_BETWEEN_AXIS_LIMITS;}
 
 private:
@@ -106,7 +98,6 @@ private:
 
     QSerialPort* serial_port;
 
-<<<<<<< HEAD
     std::map<QString, Lines*> lines;
     QString selected_line;
 
@@ -116,19 +107,11 @@ private:
 
     double axis_limits[2][2] = {{-5,5}, {-5,5}};
 
-=======
-    double axis_limits[2][2] = {{0,10}, {0,10}};
-
->>>>>>> e6d2053 (Added comment and code rearranged)
     static constexpr int32_t zoom_limits[] = {-100, 100};
     double axis_zoom[2] = {0, 0};
 
     bool see_whole_curve = false;
-<<<<<<< HEAD
     bool plot_following = false;
-=======
-    bool plot_following = true;
->>>>>>> e6d2053 (Added comment and code rearranged)
     bool show_points = false;
 
     QString getNewLineColor();
@@ -136,11 +119,7 @@ private:
     void modifyXLimits(double new_min, double new_max);
     void modifyYLimits(double new_min, double new_max);
 
-<<<<<<< HEAD
     void followPlot();
-=======
-    void follow_plot();
->>>>>>> e6d2053 (Added comment and code rearranged)
     void seeWholeCurve();
 
 signals:

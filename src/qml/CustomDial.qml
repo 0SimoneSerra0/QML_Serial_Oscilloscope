@@ -1,10 +1,6 @@
 import QtQuick
 import QtQuick.Controls
 
-<<<<<<< HEAD
-=======
-
->>>>>>> e6d2053 (Added comment and code rearranged)
 //Custom dial used in GraphControls
 Dial{
     id: root
