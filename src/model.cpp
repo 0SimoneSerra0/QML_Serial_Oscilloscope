@@ -108,9 +108,6 @@ int Model::changePort(uint16_t port_index){
     return 0;
 }
 
-<<<<<<< HEAD
-
-=======
 
 
 bool Model::changeBaudRate(uint8_t index)
@@ -204,145 +201,6 @@ bool Model::openClosePort(bool open)
         if(serial_port->isOpen())
             serial_port->close();
         if(serial_port->open(QSerialPort::ReadWrite)){
-            emit updateStateLights(true);
-            return true;
-        }else{
-            QString mes = "Error: error encountered while trying to open port: '" + serial_port->portName() + "'\n" + "Error description: " + serial_port->errorString();;
-            qDebug() << mes;
-            emit emitAddText(mes);
-            return false;
-        }
-    }else{
-        serial_port->close();
-        emit updateStateLights(false);
-        return true;
-    }
-}
->>>>>>> e6d2053 (Added comment and code rearranged)
-
-
-
-bool Model::isPortOpen()
-{
-    return serial_port->isOpen();
-}
-
-
-
-<<<<<<< HEAD
-bool Model::changeDataBits(uint8_t new_value)
-{
-    if(serial_port->setDataBits(QSerialPort::DataBits(new_value))){
-        return true;
-    }else{
-        QString mes = "Error while changing port '" + serial_port->portName() + "' data bits\nError description: " + serial_port->errorString();
-        qDebug() << mes;
-        emit emitAddText(mes);
-        return false;
-    }
-}
-
-
-
-bool Model::changeParity(uint8_t index)
-{
-    if(serial_port->setParity( index == 0 ? QSerialPort::Parity(index) : QSerialPort::Parity(index + 1) ) ){
-        return true;
-    }else{
-        QString mes = "Error while changing port '" + serial_port->portName() + "' parity\nError description: " + serial_port->errorString();
-        qDebug() << mes;
-        emit emitAddText(mes);
-        return false;
-    }
-}
-
-
-
-bool Model::changeStopBits(uint8_t index)
-{
-    if( serial_port->setStopBits(QSerialPort::StopBits(index)) ){
-        return true;
-    }else{
-        QString mes = "Error while changing port '" + serial_port->portName() + "' stop bits\nError description: " + serial_port->errorString();
-        qDebug() << mes;
-        emit emitAddText(mes);
-        return false;
-    }
-}
-
-
-
-bool Model::changeFlowControl(uint8_t index)
-{
-    QSerialPort::FlowControl f;
-    switch (index){
-    case 0:
-        f = QSerialPort::FlowControl::NoFlowControl;
-        break;
-    case 1:
-        f = QSerialPort::FlowControl::HardwareControl;
-        break;
-    case 2:
-        f = QSerialPort::FlowControl::SoftwareControl;
-        break;
-    }
-    if( serial_port->setFlowControl(f) ){
-        return true;
-    }else{
-        QString mes = "Error while changing port '" + serial_port->portName() + "' flow control\nError description: " + serial_port->errorString();
-        qDebug() << mes;
-        emit emitAddText(mes);
-        return false;
-    }
-}
-=======
-void Model::getNewValueFromSerialPort()
-{
-    if(!serial_port->isOpen())
-        return;
-
-    QString data = serial_port->readAll();
-    emit appendSerialData(data);
-
-    if(data == "")
-        return;
-
-    int _index = data.indexOf("£$");
-    while(_index != std::string::npos){
-        uint16_t _tmp_index = data.indexOf("/", _index);
-
-        //std::string _name = data.substr(_index, _tmp_index);  //for now is useless, but it will be important for a future update
-
-
-        QPointF value( data.mid(_tmp_index + 1, data.indexOf(";", _tmp_index) - _tmp_index - 1).toDouble(),
-                      data.mid(data.indexOf(";", _tmp_index) + 1, data.indexOf("$£", _tmp_index) - data.indexOf(";", _tmp_index) - 1).toDouble());
-
-        lines.push_back(value);
-        emit updateLine();
-
-        _index = data.indexOf("£$", _tmp_index);
-    }
-    if(plot_following){
-        follow_plot();
-    }else if(see_whole_curve){
-        seeWholeCurve();
-    }
-}
-
-
->>>>>>> e6d2053 (Added comment and code rearranged)
-
-
-
-
-
-
-bool Model::openClosePort(bool open)
-{
-    if(open){
-        if(serial_port->isOpen())
-            serial_port->close();
-        if(serial_port->open(QSerialPort::ReadWrite)){
             emit portStateChanged(true);
             return true;
         }else{
@@ -388,7 +246,6 @@ bool Model::writeSerialData(QString s)
 
 
 
-<<<<<<< HEAD
 void Model::getNewValueFromSerialPort()
 {
     if(!serial_port->isOpen())
@@ -444,8 +301,6 @@ void Model::getNewValueFromSerialPort()
 
 
 
-=======
->>>>>>> e6d2053 (Added comment and code rearranged)
 void Model::changeXZoom(int32_t zoom)
 {
     axis_zoom[0] = zoom;
@@ -542,7 +397,6 @@ std::vector<double> Model::getZoomedYAxisLimits()
 */
 void Model::changeXLimits(double new_min, double new_max)
 {
-<<<<<<< HEAD
     if(plot_following)
         if(lines[selected_line]->points.size() > 0)
             modifyXLimits(new_min < lines[selected_line]->points.at(lines[selected_line]->points.size() - 1).x() ? new_min : axis_limits[0][0], new_max > lines[selected_line]->points.at(lines[selected_line]->points.size() - 1).x() ? new_max : axis_limits[0][1]);
@@ -551,10 +405,6 @@ void Model::changeXLimits(double new_min, double new_max)
     else if(!see_whole_curve)
         modifyXLimits(new_min, new_max);
 
-=======
-    if(!plot_following && !see_whole_curve)
-        modifyXLimits(new_min, new_max);
->>>>>>> e6d2053 (Added comment and code rearranged)
 }
 
 
@@ -566,16 +416,12 @@ void Model::changeXLimits(double new_min, double new_max)
 */
 void Model::changeYLimits(double new_min, double new_max)
 {
-<<<<<<< HEAD
     if(plot_following)
         if(lines[selected_line]->points.size() > 0)
             modifyYLimits(new_min < lines[selected_line]->points.at(lines[selected_line]->points.size() - 1).y() ? new_min : axis_limits[1][0], new_max > lines[selected_line]->points.at(lines[selected_line]->points.size() - 1).y() ? new_max : axis_limits[1][1]);
         else
             modifyYLimits(new_min, new_max);
     else if(!see_whole_curve)
-=======
-    if(!plot_following && !see_whole_curve)
->>>>>>> e6d2053 (Added comment and code rearranged)
         modifyYLimits(new_min, new_max);
 }
 
@@ -603,7 +449,6 @@ void Model::modifyYLimits(double new_min, double new_max)
 
 
 
-<<<<<<< HEAD
 void Model::followPlot()
 {
     if(lines[selected_line]->points.size() == 0 || lines.find(selected_line) == lines.end())
@@ -620,15 +465,6 @@ void Model::followPlot()
     else if(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).y() < getZoomedYAxisLimits()[0])
         modifyYLimits(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).y(), lines[selected_line]->points.at(lines[selected_line]->points.size()-1).y() + (axis_limits[1][1] - axis_limits[1][0]));
 
-=======
-
-void Model::follow_plot()
-{
-    if(lines.size() == 0)
-        return;
-    modifyXLimits(lines.at(lines.size()-1).x() + (axis_limits[0][1] - axis_limits[0][0])*OFFSET_PLOT_FOLLOW - (axis_limits[0][1] - axis_limits[0][0]), lines.at(lines.size()-1).x() + (axis_limits[1] - axis_limits[0])*OFFSET_PLOT_FOLLOW);
-    modifyYLimits(lines.at(lines.size()-1).y() - (axis_limits[1][1] - axis_limits[1][0])/2, lines.at(lines.size()-1).y() + (axis_limits[1][1] - axis_limits[1][0])/2);
->>>>>>> e6d2053 (Added comment and code rearranged)
 }
 
 
@@ -662,7 +498,6 @@ bool Model::getShowPoints()
     return show_points;
 }
 
-<<<<<<< HEAD
 
 /*
  *seeWholeCurve()
@@ -766,9 +601,6 @@ bool Model::getSeeWholeCurve()
 {
     return see_whole_curve;
 }
-=======
-
->>>>>>> e6d2053 (Added comment and code rearranged)
 
 
 
@@ -889,30 +721,4 @@ QString Model::getNewLineColor()
     }
 
     return color;
-}
-
-
-
-void Model::setSeeWholeCurve(bool value)
-{
-    if(!value)
-        see_whole_curve = value;
-    else if(!plot_following){
-        see_whole_curve = value;
-        seeWholeCurve();
-    }
-}
-
-
-bool Model::getSeeWholeCurve()
-{
-    return see_whole_curve;
-}
-
-
-
-void Model::clearLine()
-{
-    lines.clear();
-    emit refreshLine();
 }

@@ -14,7 +14,6 @@ LineSeries {
     pointDelegate: Rectangle{
         id: marker
 
-<<<<<<< HEAD
         property int index
         Component.onCompleted: {
             index = root.count
@@ -23,12 +22,6 @@ LineSeries {
 
         width: root.width * 4
         height: width
-=======
-        property bool clicked: false
-
-        width: 16
-        height: 16
->>>>>>> e6d2053 (Added comment and code rearranged)
         border.width: 4
         radius: width/2
 
@@ -55,18 +48,7 @@ LineSeries {
                         marker.color = Qt.darker(marker.color)
                         marker.border.color = Qt.darker(marker.border.color)
                         Scripts.destroyLabel()
-<<<<<<< HEAD
                         Scripts.createLabelPointCoordinates(mouse_area_marker, root.at(marker.index - 1).x, root.at(marker.index - 1).y)
-=======
-
-
-                        //this function wnats the parent of the
-                        //LabelPointCoordinates and an x and y value,
-                        //it gets them by accessing the graph PointRenderer child
-                        //and seeing at wich index is the point, once it know that
-                        //it access the point of the series at the index just found
-                        Scripts.createLabelPointCoordinates(mouse_area_marker, root.at(root.graph.children[1].children.indexOf(marker)-1).x, root.at(root.graph.children[1].children.indexOf(marker)-1).y)
->>>>>>> e6d2053 (Added comment and code rearranged)
                     }else{
                         marker.color = "#ffffff"
                         marker.border.color = "#000000"
