@@ -43,55 +43,7 @@ Item {
         }
 
 
-        MouseArea{
-            id: mouse_area_graph
 
-            property double init_x
-            property double init_y
-
-            anchors.fill: parent
-
-            onPressed:{
-                init_x = mouseX
-                init_y = mouseY
-                update_drag_timer.start()
-            }
-
-            onReleased:{
-                update_drag_timer.stop()
-            }
-
-            onExited:{
-                update_drag_timer.stop()
-            }
-
-            onWheel:{
-                Model.changeXLimits(Model.getXAxisLimits()[0] + wheel.angleDelta.x*0.5, Model.getXAxisLimits()[1] - wheel.angleDelta.x*0.5)
-                Model.changeYLimits(Model.getYAxisLimits()[0] + wheel.angleDelta.y*0.5, Model.getYAxisLimits()[1] - wheel.angleDelta.y*0.5)
-            }
-
-            //handle the movment of the mouse while pressed on the graph
-            Timer{
-                id: update_drag_timer
-
-                property real deltaX
-                property real deltaY
-
-                repeat: true
-                interval: 5
-
-                onTriggered:{
-                    deltaX = Math.abs(Model.getZoomedXAxisLimits()[1] - Model.getZoomedXAxisLimits()[0])*(mouse_area_graph.init_x - mouse_area_graph.mouseX)/(graph.width*0.9)
-                    deltaY = Math.abs(Model.getZoomedYAxisLimits()[1] - Model.getZoomedYAxisLimits()[0])*(mouse_area_graph.init_y - mouse_area_graph.mouseY)/(graph.height*0.84)
-
-                    Model.changeXLimits(Model.getXAxisLimits()[0] + deltaX, Model.getXAxisLimits()[1] + deltaX);
-                    Model.changeYLimits(Model.getYAxisLimits()[0] - deltaY, Model.getYAxisLimits()[1] - deltaY);
-
-                    mouse_area_graph.init_x = mouse_area_graph.mouseX
-                    mouse_area_graph.init_y = mouse_area_graph.mouseY
-                }
-            }
-        }
 
 
         //lights in the bottom left of the graph part
@@ -163,21 +115,74 @@ Item {
         axisX: ValueAxis {
             id:x_axis
 
-            min: -5
-            max: 5
+            min: Model.getZoomedXAxisLimits()[0]
+            max: Model.getZoomedXAxisLimits()[1]
             tickInterval: 1
             subTickCount: 1
-            labelDecimals: 1
+            labelDecimals: 3
         }
 
         axisY: ValueAxis {
             id:y_axis
 
-            min: -5
-            max: 5
+            min: Model.getZoomedYAxisLimits()[0]
+            max: Model.getZoomedYAxisLimits()[1]
             tickInterval: 1
             subTickCount: 1
-            labelDecimals: 1
+            labelDecimals: 3
+        }
+    }
+
+    MouseArea{
+        id: mouse_area_graph
+
+        property double init_x
+        property double init_y
+
+        anchors.fill: graph
+
+        //to let the MouseArea of the points of the graph series recive the mouse input
+        propagateComposedEvents: true
+
+        onPressed:{
+            init_x = mouseX
+            init_y = mouseY
+            update_drag_timer.start()
+        }
+
+        onReleased:{
+            update_drag_timer.stop()
+        }
+
+        onExited:{
+            update_drag_timer.stop()
+        }
+
+        onWheel:{
+            Model.changeXLimits(Model.getXAxisLimits()[0] + wheel.angleDelta.x*0.5, Model.getXAxisLimits()[1] - wheel.angleDelta.x*0.5)
+            Model.changeYLimits(Model.getYAxisLimits()[0] + wheel.angleDelta.y*0.5, Model.getYAxisLimits()[1] - wheel.angleDelta.y*0.5)
+        }
+
+        //handle the movment of the mouse while pressed on the graph
+        Timer{
+            id: update_drag_timer
+
+            property real deltaX
+            property real deltaY
+
+            repeat: true
+            interval: 5
+
+            onTriggered:{
+                deltaX = Math.abs(Model.getZoomedXAxisLimits()[1] - Model.getZoomedXAxisLimits()[0])*(mouse_area_graph.init_x - mouse_area_graph.mouseX)/(graph.width*0.9)
+                deltaY = Math.abs(Model.getZoomedYAxisLimits()[1] - Model.getZoomedYAxisLimits()[0])*(mouse_area_graph.init_y - mouse_area_graph.mouseY)/(graph.height*0.84)
+
+                Model.changeXLimits(Model.getXAxisLimits()[0] + deltaX, Model.getXAxisLimits()[1] + deltaX);
+                Model.changeYLimits(Model.getYAxisLimits()[0] - deltaY, Model.getYAxisLimits()[1] - deltaY);
+
+                mouse_area_graph.init_x = mouse_area_graph.mouseX
+                mouse_area_graph.init_y = mouse_area_graph.mouseY
+            }
         }
     }
 
@@ -186,10 +191,7 @@ Item {
     Connections{
         target: Model
 
-        property var points
-        property var g
-
-        function onUpdateStateLights(state){
+        function onPortStateChanged(state){
             state_light_close.color = state ? Qt.darker("red") : "red"
             state_light_open.color = state ? "green" : Qt.darker("green")
         }
@@ -214,7 +216,9 @@ Item {
 
         function onRefreshLine(){
             var s = Model.getSelectedLine()
-
+            var points
+            if(s === "")
+                return
             if(s === "All"){
                 for(let [name, series] of Scripts.getAllLineSeries()){
                     series.clear()
@@ -224,6 +228,8 @@ Item {
                     }
                 }
             }else{
+                if(Scripts.getLineSeries(s) === null)
+                    return
                 Scripts.getLineSeries(s).clear()
                 points = Model.getLine(s)
                 for(i = 0; i < points.length; i+=1){
@@ -234,6 +240,13 @@ Item {
 
         function onLineAdded(line_name){
             Scripts.createLineSelectorElement(layout_line_selector, line_name, Qt.lighter(root.color), "#afafaf", Model.getLineColor(line_name))
+        }
+
+        function onLineRemoved(line_name){
+            Scripts.eliminateLineSelector(line_name)
+            graph.removeSeries(Scripts.getLineSeries(line_name))
+            Scripts.eliminateLineSeries(line_name)
+            return
         }
     }
 }

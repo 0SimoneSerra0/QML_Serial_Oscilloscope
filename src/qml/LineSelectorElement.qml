@@ -16,6 +16,10 @@ Item {
     Layout.fillWidth: true
     Layout.fillHeight: true
 
+    function remove(){
+        destroy()
+    }
+
     Rectangle{
         id: color_circle
 

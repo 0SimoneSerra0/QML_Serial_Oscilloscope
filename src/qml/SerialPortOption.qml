@@ -11,6 +11,8 @@ Item {
     property color bg_border_color: Qt.darker(bg_color)
     property real bg_border_width
 
+    required property var anchors_mouse_area
+
     Item{
         id: serial_port_option
 
@@ -52,8 +54,15 @@ Item {
                 onCurrentIndexChanged:{
                     Model.changePort(currentIndex)
                 }
-                onFocusChanged:{
+
+                onDownChanged:{
+                    if(!down)
+                        return
+                    var open_port = Model.isPortOpen()
+                    currentIndex = Model.getAllAvailablePortName().indexOf(valueAt(currentIndex))
                     model = Model.getAllAvailablePortName()
+                    currentIndexChanged()
+                    Model.openClosePort(open_port)
                 }
             }
         }
@@ -272,7 +281,6 @@ Item {
             id: open_and_close_button
 
             property bool btn_pressed : false
-            property bool port_open: Model.isPortOpen()
 
             y: label_flow_control_bg.y + label_flow_control_bg.height * 1.1
 
@@ -284,14 +292,6 @@ Item {
             color: root.bg_color
             border.color: root.bg_border_color
 
-            Connections{
-                target: Model
-                function onPortChanged(port_state){
-                    label_open_and_close_button.text = port_state ? "Close Port" : "Open Port"
-                    open_and_close_button.port_open = Model.isPortOpen()
-                }
-            }
-
             Label{
                 id: label_open_and_close_button
 
@@ -300,7 +300,7 @@ Item {
                 color: root.text_color
                 font.pixelSize: 1/17 * root.width
                 font.bold: true
-                text: open_and_close_button.port_open ? "Close Port" : "Open Port"
+                text: Model.isPortOpen() ? "Close Port" : "Open Port"
             }
             MouseArea{
                 id: mouse_area_open_and_close_button
@@ -326,9 +326,8 @@ Item {
                     if(open_and_close_button.btn_pressed){
                         open_and_close_button.color = Qt.darker(label_flow_cotrol.color)
                         label_open_and_close_button.color = "#afafaf"
-                        if(Model.openClosePort(!open_and_close_button.port_open)){
-                            open_and_close_button.port_open = !open_and_close_button.port_open
-                            label_open_and_close_button.text = open_and_close_button.port_open ? "Close Port" : "Open Port"
+                        if(Model.openClosePort(!Model.isPortOpen())){
+                            label_open_and_close_button.text = Model.isPortOpen() ? "Close Port" : "Open Port"
                         }
                     }
                 }
@@ -347,6 +346,8 @@ Item {
         text_color: root.text_color
         color: root.bg_color
         border_color: root.bg_color
+
+        anchors_mouse_area: root.anchors_mouse_area
     }
 
 
@@ -358,5 +359,12 @@ Item {
 
         width: root.width*0.9
         height: (1.5/3) * width
+    }
+
+    Connections{
+        target: Model
+        function onPortStateChanged(port_state){
+            label_open_and_close_button.text = port_state ? "Close Port" : "Open Port"
+        }
     }
 }

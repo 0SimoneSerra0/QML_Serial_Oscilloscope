@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Shapes
 import MyModel
+import "scripts.js" as Scripts
 
 //Control panel found at the bottom of the graph
 Item {
@@ -11,6 +12,8 @@ Item {
     property color bg_color: "#202020"
     property color dial_pointer_color: "white"
     property color bg_text_color: "#303030"
+
+    required property var anchors_mouse_area
 
 
     //X zoom controls
@@ -75,6 +78,15 @@ Item {
             value: dial_x_axis.value
 
             editable: true
+
+            onFocusChanged:{
+                if(focus){
+                    Scripts.createMouseArea(this, root.anchors_mouse_area)
+                }else{
+                    Scripts.destroyMouseArea()
+                }
+            }
+
             onValueChanged:{
                 dial_x_axis.value = spin_box_x_axis.value
                 Model.changeXZoom(dial_x_axis.value);
@@ -152,6 +164,15 @@ Item {
             value: dial_y_axis.value
 
             editable: true
+
+            onFocusChanged:{
+                if(focus){
+                    Scripts.createMouseArea(this, root.anchors_mouse_area)
+                }else{
+                    Scripts.destroyMouseArea()
+                }
+            }
+
             onValueChanged:{
                 dial_y_axis.value = spin_box_y_axis.value
                 Model.changeYZoom(dial_y_axis.value);
@@ -346,6 +367,64 @@ Item {
         }
     }
 
+    //Eliminate line button
+    Rectangle{
+        id: eliminate_btn
+
+        x: clear_line_btn.x + clear_line_btn.width*1.1
+        y: clear_line_btn.y
+
+        width: dial_x_axis.width/2
+        height: width
+        border.width: width/10
+        radius: width/2
+
+        color: Qt.darker(root.bg_color)
+        border.color: Qt.darker(color)
+
+        Text{
+            id: text_eliminate_btn
+
+            text: "Remove"
+
+            color: root.text_color
+            font.pointSize: parent.width/6
+            anchors.centerIn: parent
+        }
+
+        MouseArea{
+            id: mouse_area_eliminate_btn
+
+            property bool pressed: false
+
+            anchors.fill: parent
+
+            onPressed:{
+                eliminate_btn.color = Qt.darker(Qt.darker(root.bg_color))
+                eliminate_btn.border.color = Qt.darker(Qt.darker(eliminate_btn.color))
+                text_eliminate_btn.color = Qt.darker(root.text_color)
+                pressed = true
+            }
+            onExited:{
+                if(pressed){
+                    eliminate_btn.color = Qt.darker(root.bg_color)
+                    eliminate_btn.border.color = Qt.darker(eliminate_btn.color)
+                    text_eliminate_btn.color = root.text_color
+                    pressed = false
+                }
+            }
+            onReleased:{
+                if(pressed){
+                    Model.removeLine()
+                    eliminate_btn.color = Qt.darker(root.bg_color)
+                    eliminate_btn.border.color = Qt.darker(eliminate_btn.color)
+                    text_eliminate_btn.color = root.text_color
+                    pressed = false
+                }
+            }
+        }
+    }
+
 
     //plot follow button
     Rectangle{
@@ -528,6 +607,8 @@ Item {
 
             mode: "x_min"
             text_color: root.text_color
+
+            anchors_mouse_area: root.anchors_mouse_area
         }
         CustomTextEdit{
             id: max_x_limit
@@ -539,6 +620,8 @@ Item {
 
             mode: "x_max"
             text_color: root.text_color
+
+            anchors_mouse_area: root.anchors_mouse_area
         }
     }
 
@@ -574,6 +657,8 @@ Item {
 
             mode: "y_min"
             text_color: root.text_color
+
+            anchors_mouse_area: root.anchors_mouse_area
         }
         CustomTextEdit{
             id: max_y_limit
@@ -585,6 +670,8 @@ Item {
 
             mode: "y_max"
             text_color: root.text_color
+
+            anchors_mouse_area: root.anchors_mouse_area
         }
     }
 

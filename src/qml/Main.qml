@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Shapes
 import QtQuick.Controls
+import "scripts.js" as Scripts
 
 Window {
     id: root
@@ -110,6 +111,8 @@ Window {
                 bg_color: "#424242"
                 bg_border_color: "#101010"
                 bg_border_width: width/200
+
+                anchors_mouse_area: anchors_for_mouse_area
             }
         }
     }
@@ -117,10 +120,21 @@ Window {
     //control under the graph
     GraphControls{
         id: graph_controls
+
         x: graph.x
         y: shape.pnt2[1] + shape.strokeWidth/2
+
         width: root.width - x
         height: root.height - y
+
+        anchors_mouse_area: anchors_for_mouse_area
+    }
+
+    Item{
+        id: anchors_for_mouse_area
+
+        width: root.width
+        height: root.height
     }
 }
 

@@ -104,8 +104,7 @@ int Model::changePort(uint16_t port_index){
     QSerialPortInfo p = QSerialPortInfo::availablePorts()[port_index];
 
     serial_port->setPort(p);
-    emit portChanged(false);
-    emit updateStateLights(false);
+    emit portStateChanged(false);
     return 0;
 }
 
@@ -202,7 +201,7 @@ bool Model::openClosePort(bool open)
         if(serial_port->isOpen())
             serial_port->close();
         if(serial_port->open(QSerialPort::ReadWrite)){
-            emit updateStateLights(true);
+            emit portStateChanged(true);
             return true;
         }else{
             QString mes = "Error: error encountered while trying to open port: '" + serial_port->portName() + "'\n" + "Error description: " + serial_port->errorString();;
@@ -212,7 +211,7 @@ bool Model::openClosePort(bool open)
         }
     }else{
         serial_port->close();
-        emit updateStateLights(false);
+        emit portStateChanged(false);
         return true;
     }
 }
@@ -277,10 +276,10 @@ void Model::getNewValueFromSerialPort()
             }
 
             Lines* _l = new Lines();
-            lines.insert( std::pair<QString, Lines*>(_name, _l) );
-
             _l->name = _name;
             _l->color = getNewLineColor();
+
+            lines.insert( std::pair<QString, Lines*>(_name, _l) );
 
             emit lineAdded(_name);
         }
@@ -398,8 +397,14 @@ std::vector<double> Model::getZoomedYAxisLimits()
 */
 void Model::changeXLimits(double new_min, double new_max)
 {
-    if(!plot_following && !see_whole_curve)
+    if(plot_following)
+        if(lines[selected_line]->points.size() > 0)
+            modifyXLimits(new_min < lines[selected_line]->points.at(lines[selected_line]->points.size() - 1).x() ? new_min : axis_limits[0][0], new_max > lines[selected_line]->points.at(lines[selected_line]->points.size() - 1).x() ? new_max : axis_limits[0][1]);
+        else
+            modifyXLimits(new_min, new_max);
+    else if(!see_whole_curve)
         modifyXLimits(new_min, new_max);
+
 }
 
 
@@ -411,7 +416,12 @@ void Model::changeXLimits(double new_min, double new_max)
 */
 void Model::changeYLimits(double new_min, double new_max)
 {
-    if(!plot_following && !see_whole_curve)
+    if(plot_following)
+        if(lines[selected_line]->points.size() > 0)
+            modifyYLimits(new_min < lines[selected_line]->points.at(lines[selected_line]->points.size() - 1).y() ? new_min : axis_limits[1][0], new_max > lines[selected_line]->points.at(lines[selected_line]->points.size() - 1).y() ? new_max : axis_limits[1][1]);
+        else
+            modifyYLimits(new_min, new_max);
+    else if(!see_whole_curve)
         modifyYLimits(new_min, new_max);
 }
 
@@ -441,10 +451,20 @@ void Model::modifyYLimits(double new_min, double new_max)
 
 void Model::followPlot()
 {
-    if(lines.find(selected_line) == lines.end() || lines[selected_line]->points.size() == 0)
+    if(lines[selected_line]->points.size() == 0 || lines.find(selected_line) == lines.end())
         return;
-    modifyXLimits(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).x() + (axis_limits[0][1] - axis_limits[0][0])*OFFSET_PLOT_FOLLOW - (axis_limits[0][1] - axis_limits[0][0]), lines[selected_line]->points.at(lines[selected_line]->points.size()-1).x() + (axis_limits[1] - axis_limits[0])*OFFSET_PLOT_FOLLOW);
-    modifyYLimits(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).y() - (axis_limits[1][1] - axis_limits[1][0])/2, lines[selected_line]->points.at(lines[selected_line]->points.size()-1).y() + (axis_limits[1][1] - axis_limits[1][0])/2);
+
+    if(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).x() > getZoomedXAxisLimits()[1])
+        modifyXLimits(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).x() - (axis_limits[0][1] - axis_limits[0][0]), lines[selected_line]->points.at(lines[selected_line]->points.size()-1).x());
+    else if(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).x() < getZoomedXAxisLimits()[0])
+        modifyXLimits(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).x(), lines[selected_line]->points.at(lines[selected_line]->points.size()-1).x() + (axis_limits[1] - axis_limits[0]));
+
+
+    if(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).y() > getZoomedYAxisLimits()[1])
+        modifyYLimits(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).y() - (axis_limits[1][1] - axis_limits[1][0]), lines[selected_line]->points.at(lines[selected_line]->points.size()-1).y());
+    else if(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).y() < getZoomedYAxisLimits()[0])
+        modifyYLimits(lines[selected_line]->points.at(lines[selected_line]->points.size()-1).y(), lines[selected_line]->points.at(lines[selected_line]->points.size()-1).y() + (axis_limits[1][1] - axis_limits[1][0]));
+
 }
 
 
@@ -534,8 +554,8 @@ void Model::seeWholeCurve()
                     max[1] = p.y();
             }
         }
-        modifyXLimits(min[0] - (max[0] - min[0])*0.8, max[0] + (max[0] - min[0])*1.2);
-        modifyYLimits(min[1] - (max[1] - min[1])*0.8, max[1] + (max[1] - min[1])*1.2);
+        modifyXLimits(min[0] - (max[0] - min[0])*OFFSET_SEE_WHOLE_CURVE, max[0] + (max[0] - min[0])*OFFSET_SEE_WHOLE_CURVE);
+        modifyYLimits(min[1] - (max[1] - min[1])*OFFSET_SEE_WHOLE_CURVE, max[1] + (max[1] - min[1])*OFFSET_SEE_WHOLE_CURVE);
     }else{
         double min[2] = {0,0};
         double max[2] = {0,0};
@@ -556,8 +576,8 @@ void Model::seeWholeCurve()
             else if(p.y() > max[1])
                 max[1] = p.y();
         }
-        modifyXLimits(min[0] - (max[0] - min[0])*0.8, max[0] + (max[0] - min[0])*1.2);
-        modifyYLimits(min[1] - (max[1] - min[1])*0.8, max[1] + (max[1] - min[1])*1.2);
+        modifyXLimits(min[0] - (max[0] - min[0])*OFFSET_SEE_WHOLE_CURVE, max[0] + (max[0] - min[0])*OFFSET_SEE_WHOLE_CURVE);
+        modifyYLimits(min[1] - (max[1] - min[1])*OFFSET_SEE_WHOLE_CURVE, max[1] + (max[1] - min[1])*OFFSET_SEE_WHOLE_CURVE);
     }
 }
 
@@ -581,6 +601,8 @@ bool Model::getSeeWholeCurve()
 {
     return see_whole_curve;
 }
+
+
 
 
 
@@ -636,11 +658,67 @@ void Model::clearLine()
     emit refreshLine();
 }
 
+void Model::removeLine()
+{
+    emit lineRemoved(selected_line);
+
+    if(selected_line == "All"){
+        for(auto& p : lines){
+            delete p.second;
+            p.second = nullptr;
+        }
+        lines.clear();
+        selected_line = "";
+        emit selectedLineChanged();
+        return;
+    }else if(lines.find(selected_line) == lines.end()){
+        return;
+    }else{
+        delete lines[selected_line];
+        lines[selected_line] = nullptr;
+
+        lines.erase(lines.find(selected_line));
+        selected_line = "";
+        setSeeWholeCurve(false);
+        setPlotFollowing(false);
+        emit selectedLineChanged();
+    }
+}
+
+
+
+std::vector<QPointF> Model::getLine(QString name)
+{
+    if(lines.find(name) != lines.end())
+        return lines.at(name)->points;
+    else
+        return std::vector<QPointF>();
+}
+
+
 
 QString Model::getNewLineColor()
 {
     if(lines.size() >= colors.size())
         return "";
 
-    return colors[lines.size() - 1];
+    QString color = "";
+    for(int i = 0; i < colors.size(); ++i){
+        int c = 0;
+        for(auto& l : lines){
+            c++;
+            if(colors[i] == l.second->color)
+                break;
+            else if(c == lines.size()){
+                color = colors[i];
+                return color;
+            }
+        }
+        if(c == 0){
+            color = colors[i];
+            break;
+        }
+    }
+
+    return color;
 }

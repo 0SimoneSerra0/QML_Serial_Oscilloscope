@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import MyModel
 import QtQuick.Shapes
+import "scripts.js" as Scripts
 
 //Interface under the open/close portbutton, on this it's possible to write
 //and read data on the serial port
@@ -13,6 +14,8 @@ Item {
     property int border_width: 7
     property color text_color: "#dfdfdf"
     property bool auto_scroll_enabled: true
+
+    required property var anchors_mouse_area
 
 
     //Text on top of the interface
@@ -57,6 +60,14 @@ Item {
 
             clip: true
             color: Qt.lighter(root.text_color)
+
+            onFocusChanged:{
+                if(focus){
+                    Scripts.createMouseArea(this, root.anchors_mouse_area)
+                }else{
+                    Scripts.destroyMouseArea()
+                }
+            }
 
             onAccepted:{
                 if(text_input.text === ""){
@@ -184,6 +195,14 @@ Item {
                 wrapMode: Text.WrapAnywhere
                 readOnly: true
                 text: ""
+
+                onFocusChanged:{
+                    if(focus){
+                        Scripts.createMouseArea(this, root.anchors_mouse_area)
+                    }else{
+                        Scripts.destroyMouseArea()
+                    }
+                }
 
                 onTextChanged:{
                     if(text_area.auto_scroll){

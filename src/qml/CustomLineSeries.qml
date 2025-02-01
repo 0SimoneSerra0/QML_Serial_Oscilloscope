@@ -9,7 +9,11 @@ pragma ComponentBehavior: Bound
 //point coordinates UI
 LineSeries {
     id: root
-    property var graph
+
+    function remove(){
+
+        destroy()
+    }
 
     //Point showed in the line when the Model::show_points is true
     pointDelegate: Rectangle{

@@ -97,7 +97,17 @@ function getAllLineSeries(){
     return all_line_series
 }
 
+function eliminateLineSeries(name){
+    if(name === "")
+        return
 
+    if(name === "All"){
+        all_line_series = new Map()
+
+    }else if(all_line_series.has(name)){
+        all_line_series.delete(name)
+    }
+}
 
 
 
@@ -108,11 +118,11 @@ var name_ls
 var bg_color_ls
 var text_color_ls
 var line_color_ls
-var all_line_selectors = []
+var all_line_selectors = new Map()
 
 function createLineSelectorElement(parent, line_name, bg_color, text_color, line_color, creatingFirst = false){
 
-    if(!creatingFirst && all_line_selectors.length == 0)
+    if(!creatingFirst && all_line_selectors.size === 0)
         createLineSelectorElement(parent, "All", bg_color, text_color, Qt.rgba(0,0,0,0), true)
 
     component_line_selector = Qt.createComponent("LineSelectorElement.qml")
@@ -138,9 +148,77 @@ function finshLineSelectorCreation(){
         if (line_selector === null) {
             console.log("Error creating object");
         }else{
-            all_line_selectors.push(line_selector)
+            all_line_selectors.set(name_ls, line_selector)
         }
     } else if (component_line_selector.status === Component.Error) {
         console.log("Error loading component:", component_line_selector.errorString());
+    }
+}
+
+
+function eliminateLineSelector(name){
+    if(name === "")
+        return
+
+    if(name === "All"){
+        for(var [n, l] of all_line_selectors){
+            l.destroy()
+            console.log(l)
+        }
+        all_line_selectors = new Map()
+    }else if(all_line_selectors.has(name)){
+        all_line_selectors.get(name).remove()
+        all_line_selectors.delete(name)
+        if(all_line_selectors.size === 1){
+            all_line_selectors.get("All").remove()
+            all_line_selectors = new Map()
+        }
+
+    }
+}
+
+
+
+
+
+
+
+
+
+
+var component_mouse_area
+var mouse_area = null
+var target_obj_mouse_area
+var anc
+
+function createMouseArea(target, anchors){
+    component_mouse_area = Qt.createComponent("CustomMouseArea.qml")
+    target_obj_mouse_area = target
+    anc = anchors
+
+    if(component_mouse_area.status === Component.Ready){
+        finshMouseAreaCreation()
+    }else{
+        component_mouse_area.statusChanged.connect(finshMouseAreaCreation)
+    }
+}
+
+
+function finshMouseAreaCreation(){
+    if (component_mouse_area.status === Component.Ready) {
+        mouse_area = component_mouse_area.createObject(anc, {target: target_obj_mouse_area})
+
+        if (mouse_area === null) {
+            console.log("Error creating object");
+        }
+    } else if (component_mouse_area.status === Component.Error) {
+        console.log("Error loading component:", component_mouse_area.errorString());
+    }
+}
+
+function destroyMouseArea(){
+    if(mouse_area !== null){
+        mouse_area.destroy()
+        mouse_area = null
     }
 }

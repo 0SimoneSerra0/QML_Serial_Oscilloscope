@@ -15,15 +15,7 @@
 
 
 #define MIN_DISTANCE_BETWEEN_AXIS_LIMITS 0.0009
-#define OFFSET_PLOT_FOLLOW 0.1
-
-
-
-/*TO DO
- *  - let the user change the axis limits (every one except the max x one) when the graph is in follow plot mode
- *  - fix follow plot, so that it let constant the (max_x - min_x) difference
- *  - let the user eliminate specifics series
-*/
+#define OFFSET_SEE_WHOLE_CURVE 0.1
 
 
 
@@ -37,9 +29,10 @@ public:
     explicit Model(QObject *parent = nullptr);
     ~Model();
 
-    Q_INVOKABLE inline std::vector<QPointF> getLine(QString name) {return lines.at(name)->points;}
+    Q_INVOKABLE std::vector<QPointF> getLine(QString name);
     Q_INVOKABLE inline QString getLineColor(QString name) {return lines.at(name)->color;}
     Q_INVOKABLE void clearLine();
+    Q_INVOKABLE void removeLine();
 
     Q_INVOKABLE static std::vector<QString> getAllAvailablePortName();
     Q_INVOKABLE static std::vector<uint32_t> getCommonBaudRates();
@@ -112,7 +105,7 @@ private:
     //so if you want to increase the possible lines just add some color in here
     std::array<QString ,8> colors{"#ff4444", "#44ff44", "#4444ff", "#ffbf00", "#ff22ff", "#93c572", "adadad", "#a95c68"};
 
-    double axis_limits[2][2] = {{0,10}, {0,10}};
+    double axis_limits[2][2] = {{-5,5}, {-5,5}};
 
     static constexpr int32_t zoom_limits[] = {-100, 100};
     double axis_zoom[2] = {0, 0};
@@ -131,8 +124,7 @@ private:
 
 signals:
     void emitAddText(QString new_text);
-    void portChanged(bool port_opened);
-    void updateStateLights(bool port_opened);
+    void portStateChanged(bool port_opened);
 
     void appendSerialData(QString serial_data);
 
@@ -145,6 +137,8 @@ signals:
     void lineAdded(QString line_name);
     void selectedLineChanged();
     void refreshLine();
+
+    void lineRemoved(QString line_name);
 
 public slots:
     void getNewValueFromSerialPort();
