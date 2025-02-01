@@ -60,8 +60,6 @@ In order to identify the wanted data between all the other comunication this pro
 <br>
 ![Video1](https://github.com/user-attachments/assets/acecc313-4731-4ef6-aa3a-edcb18b4d419)
 <br>
-![Video2](https://github.com/user-attachments/assets/47adcdc8-6f45-43c0-8655-e3e6fa2f0e86)
-<br>
 <br>
 <br>
 <br>
