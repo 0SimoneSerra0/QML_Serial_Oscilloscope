@@ -49,7 +49,7 @@ In the actual version of the project the main feature are:
 The usage is very simple: **set the serial port** with its paramenter and **open** it, when the serial data arrives it will be plotted on the graph.
 In order to identify the wanted data between all the other comunication this program reads only a specific pattern:<br>
 **£$name/x_value;y_value$£**<br>
-**IMPORTANT**: there are only two invalid name, the first one il "All" and the last one is "". If you'll try to plot a series with one of this name the program will ignore it.
+**IMPORTANT**: there are only two invalid name: "All" and "". If you'll try to plot a series with one of this name the program will ignore it.
 <br>
 <br>
 <br>
