@@ -1,8 +1,8 @@
 # QML_Serial_Oscilloscope
 A completely open source project of a **serial plotter**, resembling the appearence of an oscilloscope, made using QML together with C++.
-This program plot real time data recived from serial ports on a graph. It can be usefull if is needed a controllable way to analyze information took by an external source, like a microcontroller.
-**DEV BRANCH**
-This branch is meant to be used for developing reasons, so this might mean that the version you will find here is unstable or has some functionality momentarily removed.
+This program plot real time data recived from serial ports on a graph. It can be usefull if is needed a controllable way to analyze information took by an external source, like a microcontroller.<br>
+**DEV BRANCH**<br>
+This branch is meant to be used for developing reasons, so this might mean that the version you will find here is unstable or has some functionality momentarily removed.<br>
 <br>
 <br>
 <br>
@@ -10,14 +10,14 @@ This branch is meant to be used for developing reasons, so this might mean that 
 At the moment the builds that i have tested were made using QtCreator or qt-cmake, an executable contained in Qt. Both ways requires the Qt framework installed on the building machine.<br>
 (The dependencies could be incomplete, so if you find a problem with them please inform me)
 <br>
-### Linux<br> ##
-
+<br>
+### Linux
+##
 **DEPENDENCIES**<br>
 - Debian<br>
 
 ```sudo apt install libqt6serialport6 libqt6qml6 libqt6gui6 libglx0 libopengl0 libqt6core6 libstdc++-11-dev libc6 libgcc-s1 libpthreadpool0 libqt6network6 libdlib-dev libegl1 libfontconfig1 libx11-6 libglib2.0-0 libqt6dbus6 libxkbcommon0 libgl1 libz3-4 libfreetype6 libicu72```
 
-<br>
 <br>
 
 **Build step**
