@@ -8,6 +8,7 @@ This program plot real time data recived from serial ports on a graph. It can be
 At the moment the builds that i have tested were made using QtCreator or qt-cmake, an executable contained in Qt. Both ways requires the Qt framework installed on the building machine.<br>
 (The dependencies could be incomplete, so if you find a problem with them please inform me)
 <br>
+<br>
 ### Linux<br>
 ##
 
@@ -16,7 +17,6 @@ At the moment the builds that i have tested were made using QtCreator or qt-cmak
 
 ```sudo apt install libqt6serialport6 libqt6qml6 libqt6gui6 libglx0 libopengl0 libqt6core6 libstdc++-11-dev libc6 libgcc-s1 libpthreadpool0 libqt6network6 libdlib-dev libegl1 libfontconfig1 libx11-6 libglib2.0-0 libqt6dbus6 libxkbcommon0 libgl1 libz3-4 libfreetype6 libicu72```
 
-<br>
 <br>
 
 **Build step**
