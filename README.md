@@ -11,11 +11,12 @@ At the moment the builds that i have tested were made using QtCreator or qt-cmak
 ### Linux<br>
 **DEPENDENCIES**<br>
 - Debian<br>
-```
-sudo apt install libqt6serialport6 libqt6qml6 libqt6gui6 libglx0 libopengl0 libqt6core6 libstdc++-11-dev libc6 libgcc-s1 libpthreadpool0 libqt6network6 libdlib-dev libegl1 libfontconfig1 libx11-6 libglib2.0-0 libqt6dbus6 libxkbcommon0 libgl1 libz3-4 libfreetype6 libicu72
-```
+
+```sudo apt install libqt6serialport6 libqt6qml6 libqt6gui6 libglx0 libopengl0 libqt6core6 libstdc++-11-dev libc6 libgcc-s1 libpthreadpool0 libqt6network6 libdlib-dev libegl1 libfontconfig1 libx11-6 libglib2.0-0 libqt6dbus6 libxkbcommon0 libgl1 libz3-4 libfreetype6 libicu72```
+
 <br>
 <br>
+
 ```
 cd QML_Serial_Oscilloscope/
 
@@ -25,6 +26,7 @@ mkdir build && cd build
 
 cmake --build .
 ```
+
 <br>
 <br>
 <br>
