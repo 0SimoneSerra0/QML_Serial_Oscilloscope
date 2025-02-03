@@ -1,6 +1,6 @@
 # QML_Serial_Oscilloscope
 A completely open source project of a **serial plotter**, resembling the appearence of an oscilloscope, made using QML together with C++.
-This program plot the real time data recived from a serial port on a graph. It can be usefull if is needed a controllable way to analyze information took by an external source, like a microcontroller.
+This program plot real time data recived from serial ports on a graph. It can be usefull if is needed a controllable way to analyze information took by an external source, like a microcontroller.
 <br>
 <br>
 <br>
