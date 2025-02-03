@@ -5,10 +5,15 @@ This program plot the real time data recived from a serial port on a graph. It c
 <br>
 <br>
 ## Build
-At the moment the builds that i have tested were made using QtCreator or qt-cmake, an executable contained in Qt. Both ways requires the Qt Framework installed on the building machine.<br>
-(i'm struggling at making an exact list of the dependencies, so, at the moment, you can obtain the QtQuick packages and QSerialPort one using the Qt Maintenance tool, installed with the framework)
+At the moment the builds that i have tested were made using QtCreator or qt-cmake, an executable contained in Qt. Both ways requires the Qt framework installed on the building machine.<br>
+(The dependencies could be incomplete, so if you find a problem with them please inform me)
 <br>
-### Linux
+### Linux<br>
+**DEPENDENCIES**<br>
+- Debian<br>
+```sudo apt install libqt6serialport6 libqt6qml6 libqt6gui6 libglx0 libopengl0 libqt6core6 libstdc++-11-dev libc6 libgcc-s1 libpthreadpool0 libqt6network6 libdlib-dev libegl1 libfontconfig1 libx11-6 libglib2.0-0 libqt6dbus6 libxkbcommon0 libgl1 libz3-4 libfreetype6 libicu72```
+<br>
+<br>
 ```
 cd QML_Serial_Oscilloscope/
 
@@ -41,6 +46,7 @@ In the actual version of the project the main feature are:
 ## ToDo List
 - add an icon
 - making the UI look nicer.
+- add the functionalities to set the graph on full screen mode, hide the serial port options or the graph control individually and a save plot as png function.
 <br>
 <br>
 <br>
