@@ -9,6 +9,8 @@ At the moment the builds that i have tested were made using QtCreator or qt-cmak
 (The dependencies could be incomplete, so if you find a problem with them please inform me)
 <br>
 ### Linux<br>
+##
+
 **DEPENDENCIES**<br>
 - Debian<br>
 
@@ -16,6 +18,8 @@ At the moment the builds that i have tested were made using QtCreator or qt-cmak
 
 <br>
 <br>
+
+**Build step**
 
 ```
 cd QML_Serial_Oscilloscope/
