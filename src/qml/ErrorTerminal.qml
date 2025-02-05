@@ -40,6 +40,7 @@ Item {
             Text {
                 id: output_text
                 anchors.fill: parent
+                anchors.margins: bg.width/70
                 text: ""
                 color: root.text_color
                 wrapMode: Text.Wrap

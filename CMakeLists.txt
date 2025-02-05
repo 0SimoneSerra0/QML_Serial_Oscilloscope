@@ -32,6 +32,7 @@ QML_FILES
     src/qml/SerialPortOption.qml
     src/qml/LineSelectorElement.qml
     src/qml/CustomMouseArea.qml
+    QML_FILES src/qml/CustomComboBox.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
