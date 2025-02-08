@@ -95,7 +95,7 @@ Window {
                     font.family: "Garamond"
                     font.bold: true
                     anchors.centerIn: serial_port_options_label_bg
-                    color: "#aaaaaa"
+                    color: "#bbbbbb"
                 }
             }
 
@@ -107,7 +107,7 @@ Window {
 
                 width: shape.pnt2[0] - shape.strokeWidth - x - serial_port_options_bg.border_width*0.1
                 height: root.height - shape.strokeWidth
-                text_color: "#afafaf"
+                text_color: "#bfbfbf"
                 bg_color: "#424242"
                 bg_border_color: "#101010"
                 bg_border_width: width/200

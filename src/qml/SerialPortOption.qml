@@ -153,13 +153,13 @@ Item {
                 font.bold: true
                 text: "Data bits: "
             }
-            SpinBox{
+            CustomSpinBox{
                 id: combo_box_data_bits
 
                 x: combo_box_baud_rate.x
                 anchors.verticalCenter: label_data_bits.verticalCenter
 
-                width: root.width - x*1.02
+                width: combo_box_selected_port.width
                 height: label_data_bits_bg.height
 
                 from: 5

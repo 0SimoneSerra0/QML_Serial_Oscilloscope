@@ -64,13 +64,13 @@ Item {
             }
         }
 
-        SpinBox{
+        CustomSpinBox{
             id: spin_box_x_axis
 
             anchors.horizontalCenter: dial_x_axis.horizontalCenter
-            anchors.top: dial_x_axis.bottom
+            y: dial_x_axis.height*1.1
 
-            width: dial_x_axis.width
+            width: dial_x_axis.width*1.5
 
             from: dial_x_axis.from
             to: dial_x_axis.to
@@ -150,13 +150,13 @@ Item {
             }
         }
 
-        SpinBox{
+        CustomSpinBox{
             id: spin_box_y_axis
 
             anchors.horizontalCenter: dial_y_axis.horizontalCenter
-            anchors.top: dial_y_axis.bottom
+            y: dial_y_axis.height*1.1
 
-            width: dial_y_axis.width
+            width: dial_y_axis.width*1.5
 
             from: dial_y_axis.from
             to: dial_y_axis.to
