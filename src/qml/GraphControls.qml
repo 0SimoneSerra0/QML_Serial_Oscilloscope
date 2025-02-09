@@ -531,149 +531,123 @@ Item {
     }
 
 
+    Canvas {
+        id: y_axis
+
+        x: root.width*0.76
+        y: (root.height - height)/2
+
+        height: parent.height*0.6
+        width: parent.width*0.01
+
+        antialiasing: true
+
+        onPaint: {
+            var ctx = y_axis.getContext('2d')
+
+            ctx.strokeStyle = "#000000"
+            ctx.lineWidth = y_axis.width/6
+            ctx.beginPath()
+            ctx.moveTo((y_axis.width - ctx.lineWidth)/2, y_axis.height)
+            ctx.lineTo((y_axis.width - ctx.lineWidth)/2, 0)
+            ctx.lineTo(0, y_axis.height*0.1)
+            ctx.lineTo((y_axis.width - ctx.lineWidth)/2, 0)
+            ctx.lineTo(y_axis.width - ctx.lineWidth, y_axis.height*0.1)
+            ctx.stroke()
+        }
+    }
+
+    CustomTextEdit{
+        id: max_y_limit
+
+        x: y_axis.x + (y_axis.width - width)/2
+        y: y_axis.y - height*1.1
+
+        width: (root.width - show_points_btn.x)/6
+        height: 1/4*width
+
+        mode: "y_max"
+        text_color: root.text_color
+
+        anchors_mouse_area: root.anchors_mouse_area
+    }
+
+    CustomTextEdit{
+        id: min_y_limit
+
+        x: y_axis.x + (y_axis.width - width)/2
+        y: y_axis.y + y_axis.height + height*0.1
+
+        width: (root.width - show_points_btn.x)/6
+        height: 1/4*width
+
+        mode: "y_min"
+        text_color: root.text_color
+
+        anchors_mouse_area: root.anchors_mouse_area
+    }
+
+
+
+    Canvas {
+        id: x_axis
+
+        x: y_axis.x + (y_axis.width - width)/2
+        y: y_axis.y + (y_axis.height - height)/2
+
+        height: y_axis.width
+        width: y_axis.height
+
+        antialiasing: true
+
+        onPaint: {
+            var ctx = x_axis.getContext('2d')
+
+            ctx.strokeStyle = "#000000"
+            ctx.lineWidth = x_axis.height/6
+            ctx.beginPath()
+            ctx.moveTo(0, (x_axis.height - ctx.lineWidth)/2)
+            ctx.lineTo(x_axis.width, (x_axis.height - ctx.lineWidth)/2)
+            ctx.lineTo(x_axis.width*0.9, 0)
+            ctx.lineTo(x_axis.width, (x_axis.height - ctx.lineWidth)/2)
+            ctx.lineTo(x_axis.width*0.9, x_axis.height - ctx.lineWidth)
+            ctx.stroke()
+        }
+    }
+
+
     //X limit controls
-    Rectangle{
-        id: label_x_limit_bg
+    CustomTextEdit{
+        id: min_x_limit
 
-        x: show_points_btn.x + show_points_btn.width*4
-        y: root.height/2 - height*1.5
-
-        width: (root.width - show_points_btn.x)/6
-        height: 1/4*width
-
-        color: root.bg_color
-        border.color: Qt.darker(color)
-
-        Text{
-            id:text_min_x_limit
-
-            anchors.centerIn: parent
-            text: "X Axis: "
-            font.pointSize: label_x_limit_bg.height/2
-            color: root.text_color
-        }
-
-        Rectangle{
-            id: label_min_limit_bg
-
-            y: -height*1.5
-            anchors.horizontalCenter: min_x_limit.horizontalCenter
-
-            width: (root.width - show_points_btn.x)/6
-            height: 1/4*width
-
-            color: root.bg_color
-            border.color: Qt.darker(color)
-
-            Text{
-                id: text_min_limit
-
-                anchors.centerIn: parent
-                text: "Left Limit"
-                font.pointSize: label_min_limit_bg.height/2
-                color: root.text_color
-            }
-        }
-
-        Rectangle{
-            id: label_max_limit_bg
-
-            anchors.horizontalCenter: max_x_limit.horizontalCenter
-            y: -height*1.5
-
-            width: (root.width - show_points_btn.x)/6
-            height: 1/4*width
-
-            color: root.bg_color
-            border.color: Qt.darker(color)
-
-            Text{
-                id: text_max_limit
-
-                anchors.centerIn: parent
-                text: "Right Limit"
-                font.pointSize: label_max_limit_bg.height/2
-                color: root.text_color
-            }
-        }
-
-        CustomTextEdit{
-            id: min_x_limit
-
-            x: label_x_limit_bg.width + width/4
-
-            width: label_x_limit_bg.width
-            height: label_x_limit_bg.height
-
-            mode: "x_min"
-            text_color: root.text_color
-
-            anchors_mouse_area: root.anchors_mouse_area
-        }
-        CustomTextEdit{
-            id: max_x_limit
-
-            x: min_x_limit.x + min_x_limit.width*1.5
-
-            width: label_x_limit_bg.width
-            height: label_x_limit_bg.height
-
-            mode: "x_max"
-            text_color: root.text_color
-
-            anchors_mouse_area: root.anchors_mouse_area
-        }
-    }
-
-    //Y limit controls
-    Rectangle{
-        id: label_y_limit_bg
-
-        y: root.height/2 + height*1.5
-        x: show_points_btn.x + show_points_btn.width*4
+        x: x_axis.x - width*1.1
+        y: x_axis.y + (x_axis.height - height)/2
 
         width: (root.width - show_points_btn.x)/6
         height: 1/4*width
 
-        color: root.bg_color
-        border.color: Qt.darker(color)
+        mode: "x_min"
+        text_color: root.text_color
 
-        Text{
-            id: text_min_y_limit
-
-            anchors.centerIn: parent
-            text: "Y Axis:"
-            font.pointSize: label_y_limit_bg.height/2
-            color: root.text_color
-        }
-
-        CustomTextEdit{
-            id: min_y_limit
-
-            x: label_y_limit_bg.width + width/4
-
-            width: label_y_limit_bg.width
-            height: label_y_limit_bg.height
-
-            mode: "y_min"
-            text_color: root.text_color
-
-            anchors_mouse_area: root.anchors_mouse_area
-        }
-        CustomTextEdit{
-            id: max_y_limit
-
-            x: min_y_limit.x + min_y_limit.width*1.5
-
-            width: label_y_limit_bg.width
-            height: label_y_limit_bg.height
-
-            mode: "y_max"
-            text_color: root.text_color
-
-            anchors_mouse_area: root.anchors_mouse_area
-        }
+        anchors_mouse_area: root.anchors_mouse_area
     }
+    CustomTextEdit{
+        id: max_x_limit
+
+        x: x_axis.x + x_axis.width + width*0.1
+        y: x_axis.y + (x_axis.height - height)/2
+
+        onWidthChanged: x = x_axis.x + x_axis.width + width*0.1
+
+        width: (root.width - show_points_btn.x)/6
+        height: 1/4*width
+
+        mode: "x_max"
+        text_color: root.text_color
+
+        anchors_mouse_area: root.anchors_mouse_area
+    }
+
 
     Connections{
         target: Model
