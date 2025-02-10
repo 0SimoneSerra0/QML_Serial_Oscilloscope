@@ -20,7 +20,7 @@ Item {
     CustomDial {
         id: dial_x_axis
 
-        x: (label_zoom_y_axis_bg.width - width)/2
+        x: (label_zoom_x_axis_bg.width - width)
         y: (root.height - height)/4
 
         width: root.width/15
@@ -43,7 +43,7 @@ Item {
             id: label_zoom_x_axis_bg
 
             anchors.horizontalCenter: dial_x_axis.horizontalCenter
-            y: -dial_x_axis.y
+            y: -height*1.2
 
             width: label_zoom_x_axis.text.length*label_zoom_x_axis.font.pointSize
             height: label_zoom_x_axis.font.pointSize*2
@@ -129,7 +129,7 @@ Item {
             id: label_zoom_y_axis_bg
             anchors.horizontalCenter: dial_y_axis.horizontalCenter
 
-            y: -dial_y_axis.y
+            y: -height*1.2
 
             width: label_zoom_y_axis.text.length*label_zoom_y_axis.font.pointSize
             height: label_zoom_y_axis.font.pointSize*2
@@ -190,7 +190,8 @@ Item {
     Text{
         id: shortcut_label
 
-        y: root.height*0.9 - height
+        x: dial_x_axis.x + dial_x_axis.width*1.5
+        y: root.height - height*3.5
         font.pointSize: dial_x_axis.width/7
         color: Qt.darker(root.text_color)
         text: "Ctrl + plus  ->  Zoom In\nCtrl + minus  ->  Zoom Out"
@@ -537,7 +538,7 @@ Item {
         x: root.width*0.76
         y: (root.height - height)/2
 
-        height: parent.height*0.6
+        height: parent.height*0.5
         width: parent.width*0.01
 
         antialiasing: true
@@ -555,36 +556,37 @@ Item {
             ctx.lineTo(y_axis.width - ctx.lineWidth, y_axis.height*0.1)
             ctx.stroke()
         }
-    }
 
-    CustomTextEdit{
-        id: max_y_limit
+        CustomTextEdit{
+            id: min_y_limit
 
-        x: y_axis.x + (y_axis.width - width)/2
-        y: y_axis.y - height*1.1
+            x: (y_axis.width - width)/2
+            y: y_axis.height + height*0.1
 
-        width: (root.width - show_points_btn.x)/6
-        height: 1/4*width
+            width: (root.width - show_points_btn.x)/6
+            height: 1/4*width
 
-        mode: "y_max"
-        text_color: root.text_color
+            mode: "y_min"
+            text_color: root.text_color
 
-        anchors_mouse_area: root.anchors_mouse_area
-    }
+            anchors_mouse_area: root.anchors_mouse_area
+        }
 
-    CustomTextEdit{
-        id: min_y_limit
+        CustomTextEdit{
+            id: max_y_limit
 
-        x: y_axis.x + (y_axis.width - width)/2
-        y: y_axis.y + y_axis.height + height*0.1
+            x: (y_axis.width - width)/2
+            y: - height*1.1
 
-        width: (root.width - show_points_btn.x)/6
-        height: 1/4*width
+            width: (root.width - show_points_btn.x)/6
+            height: 1/4*width
 
-        mode: "y_min"
-        text_color: root.text_color
+            mode: "y_max"
+            text_color: root.text_color
 
-        anchors_mouse_area: root.anchors_mouse_area
+            anchors_mouse_area: root.anchors_mouse_area
+        }
+
     }
 
 
@@ -613,40 +615,40 @@ Item {
             ctx.lineTo(x_axis.width*0.9, x_axis.height - ctx.lineWidth)
             ctx.stroke()
         }
+
+
+        //X limit controls
+        CustomTextEdit{
+            id: min_x_limit
+
+            x: - width*1.1
+            y: (x_axis.height - height)/2
+
+            width: (root.width - show_points_btn.x)/6
+            height: 1/4*width
+
+            mode: "x_min"
+            text_color: root.text_color
+
+            anchors_mouse_area: root.anchors_mouse_area
+        }
+
+        CustomTextEdit{
+            id: max_x_limit
+
+            x: x_axis.width + width*0.1
+            y: (x_axis.height - height)/2
+
+            width: (root.width - show_points_btn.x)/6
+            height: 1/4*width
+
+            mode: "x_max"
+            text_color: root.text_color
+
+            anchors_mouse_area: root.anchors_mouse_area
+        }
     }
 
-
-    //X limit controls
-    CustomTextEdit{
-        id: min_x_limit
-
-        x: x_axis.x - width*1.1
-        y: x_axis.y + (x_axis.height - height)/2
-
-        width: (root.width - show_points_btn.x)/6
-        height: 1/4*width
-
-        mode: "x_min"
-        text_color: root.text_color
-
-        anchors_mouse_area: root.anchors_mouse_area
-    }
-    CustomTextEdit{
-        id: max_x_limit
-
-        x: x_axis.x + x_axis.width + width*0.1
-        y: x_axis.y + (x_axis.height - height)/2
-
-        onWidthChanged: x = x_axis.x + x_axis.width + width*0.1
-
-        width: (root.width - show_points_btn.x)/6
-        height: 1/4*width
-
-        mode: "x_max"
-        text_color: root.text_color
-
-        anchors_mouse_area: root.anchors_mouse_area
-    }
 
 
     Connections{

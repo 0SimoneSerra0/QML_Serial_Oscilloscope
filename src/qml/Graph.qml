@@ -50,6 +50,7 @@ Item {
         Rectangle{
             id: state_light_close
 
+            x: root.width - (width + state_light_open.x + state_light_open.width)*1.1
             y: graph_bg.height - height
 
             width: 1/100*graph_bg.width
