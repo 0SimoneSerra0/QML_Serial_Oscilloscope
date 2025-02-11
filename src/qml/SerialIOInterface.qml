@@ -24,13 +24,13 @@ Item {
 
         x: bg_input.x + bg_input.width/2 - width/2
 
-        width: (recived_label.text.length*recived_label.font.pixelSize/2) + 0.3*height
-        height: recived_label.font.pixelSize*1.1
+        width: (recived_label.width)*1.2
+        height: recived_label.height*1.5
         border.width: 1/60*width
         radius: 10
 
-        color: Qt.rgba(0,0,0,0.3)
-        border.color: Qt.darker(root.border_color)
+        color: "#505050"
+        border.color: "#202020"
 
         Text{
             id: recived_label
@@ -38,61 +38,55 @@ Item {
             anchors.centerIn: parent
 
             font.pixelSize: bg_input.width/text.length
-            color: Qt.lighter(root.text_color)
+            color: "#bbbbbb"
             text: "Serial Terminal"
         }
     }
 
     //Writing interface
-    Rectangle{
-        id: bg_text_input
-
+    CustomTextField{
+        id: text_input
         y: recived_label_bg.y + recived_label_bg.height*1.1
 
         width: root.width
         height: 1/9 * root.height
 
         color: Qt.lighter(root.color)
-        TextField{
-            id: text_input
 
-            anchors.fill: parent
+        clip: true
 
-            clip: true
-            color: Qt.lighter(root.text_color)
-
-            onFocusChanged:{
-                if(focus){
-                    Scripts.createMouseArea(this, root.anchors_mouse_area)
-                }else{
-                    Scripts.destroyMouseArea()
-                }
+        onFocusChanged:{
+            if(focus){
+                Scripts.createMouseArea(this, root.anchors_mouse_area)
+            }else{
+                Scripts.destroyMouseArea()
             }
+        }
 
-            onAccepted:{
-                if(text_input.text === ""){
-                    return
-                }
-                if(Model.writeSerialData(text_input.text)){
-                    scroll_view.old_scroll_position = scroll_view.ScrollBar.vertical.position
-                    scroll_view.old_content_height = scroll_view.contentHeight
+        onAccepted:{
+            if(text_input.text === ""){
+                return
+            }
+            if(Model.writeSerialData(text_input.text)){
+                scroll_view.old_scroll_position = scroll_view.ScrollBar.vertical.position
+                scroll_view.old_content_height = scroll_view.contentHeight
 
-                    //write the sennding data on the text_area among all the
-                    //recived one, but the sending data get printed in white/blue
-                    text_area.text += "\n<font color=\"#aaaaff\">" + text_input.text + "</font>\n"
+                //write the sennding data on the text_area among all the
+                //recived one, but the sending data get printed in white/blue
+                text_area.text += "\n<font color=\"#aaaaff\">" + text_input.text + "</font>\n"
 
-                    text_area.textChanged()
-                    text_input.clear()
-                }
+                text_area.textChanged()
+                text_input.clear()
             }
         }
     }
+
 
     //reciving interface
     Rectangle {
         id: bg_input
 
-        y: bg_text_input.y + bg_text_input.height
+        y: text_input.y + text_input.height
 
         width: root.width
         height: root.height - y
@@ -195,14 +189,6 @@ Item {
                 wrapMode: Text.WrapAnywhere
                 readOnly: true
                 text: ""
-
-                onFocusChanged:{
-                    if(focus){
-                        Scripts.createMouseArea(this, root.anchors_mouse_area)
-                    }else{
-                        Scripts.destroyMouseArea()
-                    }
-                }
 
                 onTextChanged:{
                     if(text_area.auto_scroll){

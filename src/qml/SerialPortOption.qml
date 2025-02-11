@@ -41,14 +41,14 @@ Item {
                 font.bold: true
                 text: "Selected port:  "
             }
-            ComboBox{
+            CustomComboBox{
                 id: combo_box_selected_port
 
-                anchors.left: parent.right
+                x: parent.width + ((root.width - parent.width) - width)/2
                 anchors.verticalCenter: label_selected_port.verticalCenter
 
-                width: root.width - x*1.02
-                height: label_selected_port_bg.height
+                width: (root.width - parent.width)*0.8
+                height: label_selected_port_bg.height*0.9
 
                 model: Model.getAllAvailablePortName()
                 onCurrentIndexChanged:{
@@ -111,13 +111,13 @@ Item {
                 font.bold: true
                 text: "Baud Rate: "
             }
-            ComboBox{
+            CustomComboBox{
                 id: combo_box_baud_rate
 
                 x: combo_box_selected_port.x
                 anchors.verticalCenter: label_baud_rate.verticalCenter
 
-                width: root.width - x*1.02
+                width: combo_box_selected_port.width
                 height: label_baud_rate_bg.height
 
                 model: Model.getCommonBaudRates();
@@ -153,13 +153,13 @@ Item {
                 font.bold: true
                 text: "Data bits: "
             }
-            SpinBox{
+            CustomSpinBox{
                 id: combo_box_data_bits
 
                 x: combo_box_baud_rate.x
                 anchors.verticalCenter: label_data_bits.verticalCenter
 
-                width: root.width - x*1.02
+                width: combo_box_selected_port.width
                 height: label_data_bits_bg.height
 
                 from: 5
@@ -196,13 +196,13 @@ Item {
                 font.bold: true
                 text: "Parity: "
             }
-            ComboBox{
+            CustomComboBox{
                 id: combo_box_parity
 
                 x: combo_box_data_bits.x
                 anchors.verticalCenter: label_parity.verticalCenter
 
-                width: root.width - x*1.02
+                width: combo_box_selected_port.width
                 height: label_parity_bg.height
 
                 model: Model.getPossibleParity();
@@ -239,13 +239,13 @@ Item {
                 font.bold: true
                 text: "Stop bits: "
             }
-            ComboBox{
+            CustomComboBox{
                 id: combo_box_stop_bits
 
                 x: combo_box_parity.x
                 anchors.verticalCenter: label_stop_bits_bg.verticalCenter
 
-                width: root.width - x*1.02
+                width: combo_box_selected_port.width
                 height: label_stop_bits_bg.height
                 model: Model.getPossibleStopBits();
 
@@ -279,13 +279,13 @@ Item {
                 font.bold: true
                 text: "Flow control: "
             }
-            ComboBox{
+            CustomComboBox{
                 id: combo_box_flow_control
 
                 x: combo_box_stop_bits.x
                 anchors.verticalCenter: label_flow_control_bg.verticalCenter
 
-                width: root.width - x*1.02
+                width: combo_box_selected_port.width
                 height: label_flow_control_bg.height
 
                 model: Model.getPossibleFlowControls();
@@ -304,7 +304,7 @@ Item {
 
             y: label_flow_control_bg.y + label_flow_control_bg.height * 1.1
 
-            width: root.width
+            width: combo_box_flow_control.x + combo_box_flow_control.width
             height: label_open_and_close_button.font.pixelSize*1.7
             border.width: 1/90 * width
             radius:20
@@ -360,7 +360,7 @@ Item {
 
         y: serial_port_option.height + root.width/30
 
-        width: root.width
+        width: open_and_close_button.width
         height: (2/3) * root.width
 
         text_color: root.text_color
@@ -374,10 +374,9 @@ Item {
     ErrorTerminal{
         id: error_terminal
 
-        x: (root.width - width)/2
         y: serial_io_interface.y + serial_io_interface.height + (root.height - serial_io_interface.y - serial_io_interface.height - height)/2
 
-        width: root.width*0.9
+        width: open_and_close_button.width
         height: (1.5/3) * width
     }
 

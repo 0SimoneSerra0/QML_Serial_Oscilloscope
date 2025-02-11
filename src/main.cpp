@@ -1,5 +1,6 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QIcon>
 #include "header/model.h"
 
 int main(int argc, char *argv[])
@@ -19,6 +20,8 @@ int main(int argc, char *argv[])
         []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
     engine.loadFromModule("Oscilloscope", "Main");
+
+    app.setWindowIcon(QIcon(":/icons/assets/Icon.png"));
 
     return app.exec();
 }

@@ -20,7 +20,7 @@ Item {
     CustomDial {
         id: dial_x_axis
 
-        x: (label_zoom_y_axis_bg.width - width)/2
+        x: (label_zoom_x_axis_bg.width - width)
         y: (root.height - height)/4
 
         width: root.width/15
@@ -43,7 +43,7 @@ Item {
             id: label_zoom_x_axis_bg
 
             anchors.horizontalCenter: dial_x_axis.horizontalCenter
-            y: -dial_x_axis.y
+            y: -height*1.2
 
             width: label_zoom_x_axis.text.length*label_zoom_x_axis.font.pointSize
             height: label_zoom_x_axis.font.pointSize*2
@@ -64,13 +64,13 @@ Item {
             }
         }
 
-        SpinBox{
+        CustomSpinBox{
             id: spin_box_x_axis
 
             anchors.horizontalCenter: dial_x_axis.horizontalCenter
-            anchors.top: dial_x_axis.bottom
+            y: dial_x_axis.height*1.1
 
-            width: dial_x_axis.width
+            width: dial_x_axis.width*1.5
 
             from: dial_x_axis.from
             to: dial_x_axis.to
@@ -129,7 +129,7 @@ Item {
             id: label_zoom_y_axis_bg
             anchors.horizontalCenter: dial_y_axis.horizontalCenter
 
-            y: -dial_y_axis.y
+            y: -height*1.2
 
             width: label_zoom_y_axis.text.length*label_zoom_y_axis.font.pointSize
             height: label_zoom_y_axis.font.pointSize*2
@@ -150,13 +150,13 @@ Item {
             }
         }
 
-        SpinBox{
+        CustomSpinBox{
             id: spin_box_y_axis
 
             anchors.horizontalCenter: dial_y_axis.horizontalCenter
-            anchors.top: dial_y_axis.bottom
+            y: dial_y_axis.height*1.1
 
-            width: dial_y_axis.width
+            width: dial_y_axis.width*1.5
 
             from: dial_y_axis.from
             to: dial_y_axis.to
@@ -190,7 +190,8 @@ Item {
     Text{
         id: shortcut_label
 
-        y: root.height*0.9 - height
+        x: dial_x_axis.x
+        y: dial_x_axis.y + spin_box_x_axis.y + spin_box_x_axis.height + ((root.height - dial_x_axis.y - spin_box_x_axis.y - spin_box_x_axis.height) - height)/2
         font.pointSize: dial_x_axis.width/7
         color: Qt.darker(root.text_color)
         text: "Ctrl + plus  ->  Zoom In\nCtrl + minus  ->  Zoom Out"
@@ -531,92 +532,175 @@ Item {
     }
 
 
-    //X limit controls
     Rectangle{
-        id: label_x_limit_bg
+        id: hide_show_curve_btn
 
-        x: show_points_btn.x + show_points_btn.width*4
-        y: root.height/2 - height*1.5
+        x: see_whole_curve_btn.x
+        y: see_whole_curve_btn.y + see_whole_curve_btn.height*1.1
 
-        width: (root.width - show_points_btn.x)/6
-        height: 1/4*width
+        width: dial_x_axis.width/2
+        height: width
+        border.width: width/10
+        radius: width/20
 
-        color: root.bg_color
+        color: Qt.darker(Qt.darker(root.bg_color))
         border.color: Qt.darker(color)
 
-        Text{
-            id:text_min_x_limit
+        Image {
+            id: symbol_hide_show_curve
+            source: "/icons/assets/open_eye.png"
 
-            anchors.centerIn: parent
-            text: "X Axis: "
-            font.pointSize: label_x_limit_bg.height/2
-            color: root.text_color
-        }
+            anchors.fill: parent
 
-        Rectangle{
-            id: label_min_limit_bg
+            Rectangle{
+                id: mask
+                color: Qt.rgba(0,0,0,0.7)
+                anchors.fill: parent
 
-            y: -height*1.5
-            anchors.horizontalCenter: min_x_limit.horizontalCenter
+                MouseArea{
+                    id: mouse_area_hide_show_curve_btn
 
-            width: (root.width - show_points_btn.x)/6
-            height: 1/4*width
+                    property bool active: false
+                    anchors.fill: parent
 
-            color: root.bg_color
-            border.color: Qt.darker(color)
+                    function changeValue(new_value){
+                        active = new_value
 
-            Text{
-                id: text_min_limit
+                        if(active){
+                            hide_show_curve_btn.color = Qt.darker(root.bg_color)
+                            hide_show_curve_btn.border.color = Qt.darker(hide_show_curve_btn.color)
+                            mask.color = Qt.rgba(0,0,0,0)
+                        }else{
+                            hide_show_curve_btn.color = Qt.darker(Qt.darker(root.bg_color))
+                            hide_show_curve_btn.border.color = Qt.darker(Qt.darker(hide_show_curve_btn.color))
+                            mask.color = Qt.rgba(0,0,0,0.7)
+                        }
+                    }
 
-                anchors.centerIn: parent
-                text: "Left Limit"
-                font.pointSize: label_min_limit_bg.height/2
-                color: root.text_color
+                    onClicked:{
+                        if(Model.getSelectedLine() === "")
+                            return
+
+                        Model.setVisibilityOfSelectedSeries(!active)
+
+                        changeValue(!active)
+                    }
+                }
             }
         }
+    }
 
-        Rectangle{
-            id: label_max_limit_bg
 
-            anchors.horizontalCenter: max_x_limit.horizontalCenter
-            y: -height*1.5
 
-            width: (root.width - show_points_btn.x)/6
-            height: 1/4*width
+    Canvas {
+        id: y_axis
 
-            color: root.bg_color
-            border.color: Qt.darker(color)
+        x: root.width*0.76
+        y: (root.height - height)/2
 
-            Text{
-                id: text_max_limit
+        height: parent.height*0.5
+        width: parent.width*0.01
 
-                anchors.centerIn: parent
-                text: "Right Limit"
-                font.pointSize: label_max_limit_bg.height/2
-                color: root.text_color
-            }
+        antialiasing: true
+
+        onPaint: {
+            var ctx = y_axis.getContext('2d')
+
+            ctx.strokeStyle = "#000000"
+            ctx.lineWidth = y_axis.width/6
+            ctx.beginPath()
+            ctx.moveTo((y_axis.width - ctx.lineWidth)/2, y_axis.height)
+            ctx.lineTo((y_axis.width - ctx.lineWidth)/2, 0)
+            ctx.lineTo(0, y_axis.height*0.1)
+            ctx.lineTo((y_axis.width - ctx.lineWidth)/2, 0)
+            ctx.lineTo(y_axis.width - ctx.lineWidth, y_axis.height*0.1)
+            ctx.stroke()
         }
 
         CustomTextEdit{
+            id: min_y_limit
+
+            x: (y_axis.width - width)/2
+            y: y_axis.height + height*0.1
+
+            width: (root.width - show_points_btn.x)/6
+            height: 1/4*width
+
+            mode: "y_min"
+            text_color: root.text_color
+
+            anchors_mouse_area: root.anchors_mouse_area
+        }
+
+        CustomTextEdit{
+            id: max_y_limit
+
+            x: (y_axis.width - width)/2
+            y: - height*1.1
+
+            width: (root.width - show_points_btn.x)/6
+            height: 1/4*width
+
+            mode: "y_max"
+            text_color: root.text_color
+
+            anchors_mouse_area: root.anchors_mouse_area
+        }
+
+    }
+
+
+
+    Canvas {
+        id: x_axis
+
+        x: y_axis.x + (y_axis.width - width)/2
+        y: y_axis.y + (y_axis.height - height)/2
+
+        height: y_axis.width
+        width: y_axis.height
+
+        antialiasing: true
+
+        onPaint: {
+            var ctx = x_axis.getContext('2d')
+
+            ctx.strokeStyle = "#000000"
+            ctx.lineWidth = x_axis.height/6
+            ctx.beginPath()
+            ctx.moveTo(0, (x_axis.height - ctx.lineWidth)/2)
+            ctx.lineTo(x_axis.width, (x_axis.height - ctx.lineWidth)/2)
+            ctx.lineTo(x_axis.width*0.9, 0)
+            ctx.lineTo(x_axis.width, (x_axis.height - ctx.lineWidth)/2)
+            ctx.lineTo(x_axis.width*0.9, x_axis.height - ctx.lineWidth)
+            ctx.stroke()
+        }
+
+
+        //X limit controls
+        CustomTextEdit{
             id: min_x_limit
 
-            x: label_x_limit_bg.width + width/4
+            x: - width*1.1
+            y: (x_axis.height - height)/2
 
-            width: label_x_limit_bg.width
-            height: label_x_limit_bg.height
+            width: (root.width - show_points_btn.x)/6
+            height: 1/4*width
 
             mode: "x_min"
             text_color: root.text_color
 
             anchors_mouse_area: root.anchors_mouse_area
         }
+
         CustomTextEdit{
             id: max_x_limit
 
-            x: min_x_limit.x + min_x_limit.width*1.5
+            x: x_axis.width + width*0.1
+            y: (x_axis.height - height)/2
 
-            width: label_x_limit_bg.width
-            height: label_x_limit_bg.height
+            width: (root.width - show_points_btn.x)/6
+            height: 1/4*width
 
             mode: "x_max"
             text_color: root.text_color
@@ -625,55 +709,7 @@ Item {
         }
     }
 
-    //Y limit controls
-    Rectangle{
-        id: label_y_limit_bg
 
-        y: root.height/2 + height*1.5
-        x: show_points_btn.x + show_points_btn.width*4
-
-        width: (root.width - show_points_btn.x)/6
-        height: 1/4*width
-
-        color: root.bg_color
-        border.color: Qt.darker(color)
-
-        Text{
-            id: text_min_y_limit
-
-            anchors.centerIn: parent
-            text: "Y Axis:"
-            font.pointSize: label_y_limit_bg.height/2
-            color: root.text_color
-        }
-
-        CustomTextEdit{
-            id: min_y_limit
-
-            x: label_y_limit_bg.width + width/4
-
-            width: label_y_limit_bg.width
-            height: label_y_limit_bg.height
-
-            mode: "y_min"
-            text_color: root.text_color
-
-            anchors_mouse_area: root.anchors_mouse_area
-        }
-        CustomTextEdit{
-            id: max_y_limit
-
-            x: min_y_limit.x + min_y_limit.width*1.5
-
-            width: label_y_limit_bg.width
-            height: label_y_limit_bg.height
-
-            mode: "y_max"
-            text_color: root.text_color
-
-            anchors_mouse_area: root.anchors_mouse_area
-        }
-    }
 
     Connections{
         target: Model
@@ -703,6 +739,11 @@ Item {
                     symbol_see_whole_curve.border.color = Qt.darker(root.text_color)
                 }
             }
+
+            if(Model.getSelectedLine() === "")
+                mouse_area_hide_show_curve_btn.changeValue(false)
+            else
+                mouse_area_hide_show_curve_btn.changeValue(Model.getVisibilityOfSeries(Model.getSelectedLine()))
         }
 
         function onPlotFollowingChanged(){

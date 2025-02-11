@@ -750,6 +750,41 @@ void Model::removeLine()
 
 
 
+void Model::setVisibilityOfSelectedSeries(bool visible)
+{
+    if(selected_line == "")
+        return;
+
+    if(selected_line == "All")
+        for(auto& p : lines){
+            p.second->visible = visible;
+        }
+    else if(lines.find(selected_line) != lines.end())
+        lines.at(selected_line)->visible = visible;
+
+    emit changeSeriesVisibility(selected_line);
+}
+
+
+
+bool Model::getVisibilityOfSeries(QString name)
+{
+    if(name == "")
+        return false;
+
+    if(name == "All"){
+        for(auto& p : lines){
+            if(p.second->visible)
+                return true;
+        }
+        return false;
+    }else if(lines.find(name) != lines.end()){
+        return lines.at(name)->visible;
+    }
+}
+
+
+
 std::vector<QPointF> Model::getLine(QString name)
 {
     if(lines.find(name) != lines.end())

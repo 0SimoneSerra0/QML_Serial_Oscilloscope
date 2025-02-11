@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.16)
 project(Oscilloscope VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Quick SerialPort)
 
@@ -12,6 +14,7 @@ qt_add_executable(appOscilloscope
     src/main.cpp
     header/model.h
     src/model.cpp
+    assets.qrc
 )
 
 qt_add_qml_module(appOscilloscope
@@ -32,6 +35,10 @@ QML_FILES
     src/qml/SerialPortOption.qml
     src/qml/LineSelectorElement.qml
     src/qml/CustomMouseArea.qml
+    src/qml/CustomComboBox.qml
+    src/qml/CustomTextField.qml
+    src/qml/CustomSpinBox.qml
+    RESOURCES assets.qrc
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

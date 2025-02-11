@@ -53,6 +53,7 @@ Item {
             limit.text = "0"
 
         limit.modifying_text = false
+        limit.width = limit.text.lenght*limit.font.pointSize*2
     }
 
     TextField{
@@ -61,10 +62,19 @@ Item {
         property bool modifying_text: false
         Component.onCompleted: getValueFromModel()
 
-        width: root.width
-        height: root.height
+        anchors.fill: root
 
         color: root.text_color
+
+        background: Rectangle{
+            id: bg
+
+            anchors.fill: limit
+
+            color: Qt.rgba(0,0,0,0)
+            border.width: height/20
+            border.color: Qt.lighter("#434343")
+        }
 
         onFocusChanged:{
             if(focus){

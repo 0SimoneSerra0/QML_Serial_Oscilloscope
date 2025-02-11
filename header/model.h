@@ -33,6 +33,8 @@ public:
     Q_INVOKABLE inline QString getLineColor(QString name) {return lines.at(name)->color;}
     Q_INVOKABLE void clearLine();
     Q_INVOKABLE void removeLine();
+    Q_INVOKABLE void setVisibilityOfSelectedSeries(bool visible);
+    Q_INVOKABLE bool getVisibilityOfSeries(QString name);
 
     Q_INVOKABLE static std::vector<QString> getAllAvailablePortName();
     Q_INVOKABLE static std::vector<uint32_t> getCommonBaudRates();
@@ -86,13 +88,13 @@ public:
     Q_INVOKABLE void setSelectedLine(QString line_name);
     Q_INVOKABLE QString getSelectedLine();
 
-
     Q_INVOKABLE inline double getMinDistanceBetweenAxisLimits() const {return MIN_DISTANCE_BETWEEN_AXIS_LIMITS;}
 
 private:
     struct Lines{
         std::vector<QPointF> points;
         QString name, color;
+        bool visible = true;
     };
 
 
@@ -147,6 +149,8 @@ signals:
 
     void plotFollowingChanged();
     void seeWholeCurveChanged();
+
+    void changeSeriesVisibility(QString series_name);
 
 public slots:
     void getNewValueFromSerialPort();

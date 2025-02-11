@@ -50,7 +50,7 @@ Item {
         Rectangle{
             id: state_light_close
 
-            y: graph_bg.height - height
+            y: graph_bg.height - height*1.2
 
             width: 1/100*graph_bg.width
             height: width
@@ -252,6 +252,17 @@ Item {
             }
             Scripts.eliminateLineSeries(line_name)
             return
+        }
+
+        function onChangeSeriesVisibility(series_name){
+            if(series_name === "All")
+                for(let [name, series] of Scripts.getAllLineSeries())
+                    series.visible = Model.getVisibilityOfSeries(series_name)
+            else{
+                if(Scripts.getLineSeries(series_name) === null)
+                    return
+                Scripts.getLineSeries(series_name).visible = Model.getVisibilityOfSeries(series_name)
+            }
         }
     }
 }

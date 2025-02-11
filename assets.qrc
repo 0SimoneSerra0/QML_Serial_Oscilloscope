@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>assets/open_eye.png</file>
+        <file>assets/Icon.png</file>
+        <file>assets/arrow.png</file>
+    </qresource>
+    <qresource prefix="/"/>
+</RCC>
