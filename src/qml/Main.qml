@@ -27,8 +27,8 @@ Window {
             fillColor: "#2f2f2f"
             strokeStyle: ShapePath.RoundJoin
 
-            property var pnt1 : [serial_port_options_bg.width, strokeWidth/2]
-            property var pnt2 : [serial_port_options_bg.width, graph_ctrl_container.y]
+            property var pnt1 : [graph.x, strokeWidth/2]
+            property var pnt2 : [graph.x, graph_ctrl_container.y]
             property var pnt3 : [root.width,  graph_ctrl_container.y]
             property var pnt4 : [root.width, root.height]
             property var pnt5 : [strokeWidth/2, root.height]
@@ -71,7 +71,7 @@ Window {
             Rectangle{
                 id: serial_port_options_label_bg
 
-                x: (serial_port_options_bg - width)/2
+                x: serial_port_options_bg.x + (serial_port_options_bg.width - width)/2
                 y: serial_port_options_bg.border_width*1.1
 
                 width: parent.width*0.95
@@ -95,10 +95,11 @@ Window {
 
             SerialPortOption{
                 id: serial_port_options
+
                 x: serial_port_options_bg.x
                 y: serial_port_options_label_bg.y + serial_port_options_label_bg.height + root.height/60
 
-                width: shape.pnt2[0] - shape.strokeWidth - x - serial_port_options_bg.border_width*0.1
+                width: parent.width
                 height: root.height - shape.strokeWidth
                 text_color: "#bfbfbf"
                 bg_color: "#424242"
@@ -113,7 +114,7 @@ Window {
     Graph{
         id: graph
 
-        x: serial_port_options_bg.x + serial_port_options_bg.width
+        x: bg_hide_serial_port_options_btn.x + bg_hide_serial_port_options_btn.width
 
         width: root.width - x
         height: graph_ctrl_container.y
@@ -141,16 +142,22 @@ Window {
     }
 
 
+    //hide serial port optons button
     Rectangle{
         id: bg_hide_serial_port_options_btn
 
         x: serial_port_options_bg.x + serial_port_options_bg.width
-        y: root.height - height
 
-        width: root.width/30
-        height: width*0.50
+        width: root.width/45
+        height: width
 
         color: "#202020"
+
+        Image {
+            source: "/icons/assets/arrow.png"
+            rotation: mouse_area_show_hide_serial_port_options_ctrls.options_hided ? 0 : 180
+            anchors.fill: parent
+        }
 
         MouseArea{
             id: mouse_area_show_hide_serial_port_options_ctrls
@@ -187,17 +194,25 @@ Window {
             }
         }
     }
+
     //Hide graphs controls Button
     Rectangle{
         id: bg_hide_ctrls_btn
 
-        x: bg_hide_serial_port_options_btn.x + bg_hide_serial_port_options_btn.width*1.1
-        y: root.height - height
+        x: bg_hide_serial_port_options_btn.x
+        y: graph.height - height
 
-        width: root.width/30
-        height: width*0.50
+        width: bg_hide_serial_port_options_btn.width
+        height: width
 
         color: "#202020"
+
+        Image {
+            source: "/icons/assets/arrow.png"
+            rotation: mouse_area_show_hide_graph_ctrls.ctrls_hided ? 270 : 90
+            anchors.fill: parent
+        }
+
         MouseArea{
             id: mouse_area_show_hide_graph_ctrls
             anchors.fill: parent

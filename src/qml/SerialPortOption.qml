@@ -304,7 +304,7 @@ Item {
 
             y: label_flow_control_bg.y + label_flow_control_bg.height * 1.1
 
-            width: root.width
+            width: combo_box_flow_control.x + combo_box_flow_control.width
             height: label_open_and_close_button.font.pixelSize*1.7
             border.width: 1/90 * width
             radius:20
@@ -360,7 +360,7 @@ Item {
 
         y: serial_port_option.height + root.width/30
 
-        width: root.width
+        width: open_and_close_button.width
         height: (2/3) * root.width
 
         text_color: root.text_color
@@ -374,10 +374,9 @@ Item {
     ErrorTerminal{
         id: error_terminal
 
-        x: (root.width - width)/2
         y: serial_io_interface.y + serial_io_interface.height + (root.height - serial_io_interface.y - serial_io_interface.height - height)/2
 
-        width: root.width*0.9
+        width: open_and_close_button.width
         height: (1.5/3) * width
     }
 

@@ -190,8 +190,8 @@ Item {
     Text{
         id: shortcut_label
 
-        x: dial_x_axis.x + dial_x_axis.width*1.5
-        y: root.height - height*3.5
+        x: dial_x_axis.x
+        y: dial_x_axis.y + spin_box_x_axis.y + spin_box_x_axis.height + ((root.height - dial_x_axis.y - spin_box_x_axis.y - spin_box_x_axis.height) - height)/2
         font.pointSize: dial_x_axis.width/7
         color: Qt.darker(root.text_color)
         text: "Ctrl + plus  ->  Zoom In\nCtrl + minus  ->  Zoom Out"
@@ -532,6 +532,66 @@ Item {
     }
 
 
+    Rectangle{
+        id: hide_show_curve_btn
+
+        x: see_whole_curve_btn.x
+        y: see_whole_curve_btn.y + see_whole_curve_btn.height*1.1
+
+        width: dial_x_axis.width/2
+        height: width
+        border.width: width/10
+        radius: width/20
+
+        color: Qt.darker(Qt.darker(root.bg_color))
+        border.color: Qt.darker(color)
+
+        Image {
+            id: symbol_hide_show_curve
+            source: "/icons/assets/open_eye.png"
+
+            anchors.fill: parent
+
+            Rectangle{
+                id: mask
+                color: Qt.rgba(0,0,0,0.7)
+                anchors.fill: parent
+
+                MouseArea{
+                    id: mouse_area_hide_show_curve_btn
+
+                    property bool active: false
+                    anchors.fill: parent
+
+                    function changeValue(new_value){
+                        active = new_value
+
+                        if(active){
+                            hide_show_curve_btn.color = Qt.darker(root.bg_color)
+                            hide_show_curve_btn.border.color = Qt.darker(hide_show_curve_btn.color)
+                            mask.color = Qt.rgba(0,0,0,0)
+                        }else{
+                            hide_show_curve_btn.color = Qt.darker(Qt.darker(root.bg_color))
+                            hide_show_curve_btn.border.color = Qt.darker(Qt.darker(hide_show_curve_btn.color))
+                            mask.color = Qt.rgba(0,0,0,0.7)
+                        }
+                    }
+
+                    onClicked:{
+                        if(Model.getSelectedLine() === "")
+                            return
+
+                        Model.setVisibilityOfSelectedSeries(!active)
+
+                        changeValue(!active)
+                    }
+                }
+            }
+        }
+    }
+
+
+
     Canvas {
         id: y_axis
 
@@ -679,6 +739,11 @@ Item {
                     symbol_see_whole_curve.border.color = Qt.darker(root.text_color)
                 }
             }
+
+            if(Model.getSelectedLine() === "")
+                mouse_area_hide_show_curve_btn.changeValue(false)
+            else
+                mouse_area_hide_show_curve_btn.changeValue(Model.getVisibilityOfSeries(Model.getSelectedLine()))
         }
 
         function onPlotFollowingChanged(){

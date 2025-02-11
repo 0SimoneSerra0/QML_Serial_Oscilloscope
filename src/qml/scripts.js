@@ -81,7 +81,11 @@ function finishLineSeriesCreation() {
 }
 
 function getLineSeries(name){
+    if(name === "" || name === "All")
+        return null
+
     let _l = all_line_series.get(name)
+
     if(_l === undefined){
         return null
     }else{
