@@ -49,7 +49,7 @@ In the actual version of the project the main feature are:
 - A virtual switch that **highlight** the actual **point** of the series. Each point is **clickable** and makes pop a litle dialog with its **coordinates**, and a button that let the user hide specifics series.
 - **Multi channeling**. The program can plot up to 8 curves of data on the same graph. This number is easely customizable by modifying the 'colors' array in src/model.h, because is its size that determine the maximum number of line series on the plot.
 - An interface to **select** a specific series or all the series. To use all the function of the program with each curve there is a litle list of clickable button just under the graph.
-- An 'hide controls' fnction to let the actual graoh occupy more space
+- An **hide controls** function to see the grap in full screen
 <br>
 <br>
 <br>
