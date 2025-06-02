@@ -78,7 +78,7 @@ In order to identify the wanted data between all the other comunication this pro
 <br>
 <br>
 
-### Arduino sketch for testing the program
+### Arduino sketch to test the program
 ```
 void setup() {
   Serial.begin(9600);
