@@ -21,7 +21,7 @@ At the moment the builds that i have tested were made using QtCreator or qt-cmak
 
 <br>
 
-**Build step**
+**Build steps**
 
 ```
 cd QML_Serial_Oscilloscope/
