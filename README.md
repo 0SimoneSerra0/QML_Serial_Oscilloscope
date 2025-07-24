@@ -5,8 +5,7 @@ This program plot real time data recived from serial ports on a graph. It can be
 <br>
 <br>
 ## Build
-At the moment the builds that i have tested were made using QtCreator or qt-cmake, an executable contained in Qt. Both ways requires the Qt framework installed on the building machine.<br>
-(The dependencies could be incomplete, so if you find a problem with them please inform me)
+if you find a problem with the dependencies please report it
 <br>
 <br>
 ### Linux<br>
@@ -28,7 +27,7 @@ cd QML_Serial_Oscilloscope/
 
 mkdir build && cd build
 
-~/Qt/<QT_VERSION>/gcc_64/bin/qt-cmake ..
+cmake ..
 
 cmake --build .
 ```
