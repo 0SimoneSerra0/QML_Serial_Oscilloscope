@@ -5,8 +5,7 @@ This program plot real time data recived from serial ports on a graph. It can be
 <br>
 <br>
 ## Build
-At the moment the builds that i have tested were made using QtCreator or qt-cmake, an executable contained in Qt. Both ways requires the Qt framework installed on the building machine.<br>
-(The dependencies could be incomplete, so if you find a problem with them please inform me)
+if you find a problem with the dependencies please report it
 <br>
 <br>
 ### Linux<br>
@@ -17,18 +16,18 @@ At the moment the builds that i have tested were made using QtCreator or qt-cmak
 **DEPENDENCIES**<br>
 - Debian<br>
 
-```sudo apt install libqt6serialport6 libqt6qml6 libqt6gui6 libglx0 libopengl0 libqt6core6 libstdc++-11-dev libc6 libgcc-s1 libpthreadpool0 libqt6network6 libdlib-dev libegl1 libfontconfig1 libx11-6 libglib2.0-0 libqt6dbus6 libxkbcommon0 libgl1 libz3-4 libfreetype6 libicu72```
+```sudo apt install libqt6serialport6 libqt6qml6 libqt6gui6 libglx0 libopengl0 libqt6core6 libstdc++-11-dev libc6 libgcc-s1 libpthreadpool0 libqt6network6 libdlib-dev libegl1 libfontconfig1 libx11-6 libglib2.0-0 libqt6dbus6 libxkbcommon0 libgl1 libz3-4 libfreetype6 qt6-base-dev qt6-base-dev-tools qt6-declarative-dev qt6-serialport-dev```
 
 <br>
 
-**Build step**
+**Build steps**
 
 ```
 cd QML_Serial_Oscilloscope/
 
 mkdir build && cd build
 
-~/Qt/<QT_VERSION>/gcc_64/bin/qt-cmake ..
+cmake ..
 
 cmake --build .
 ```
@@ -49,7 +48,7 @@ In the actual version of the project the main feature are:
 - A virtual switch that **highlight** the actual **point** of the series. Each point is **clickable** and makes pop a litle dialog with its **coordinates**, and a button that let the user hide specifics series.
 - **Multi channeling**. The program can plot up to 8 curves of data on the same graph. This number is easely customizable by modifying the 'colors' array in src/model.h, because is its size that determine the maximum number of line series on the plot.
 - An interface to **select** a specific series or all the series. To use all the function of the program with each curve there is a litle list of clickable button just under the graph.
-- An 'hide controls' fnction to let the actual graoh occupy more space
+- An **hide controls** function to see the grap in full screen
 <br>
 <br>
 <br>
@@ -58,7 +57,7 @@ In the actual version of the project the main feature are:
 The usage is very simple: **set the serial port** with its paramenter and **open** it, when the serial data arrives it will be plotted on the graph.
 In order to identify the wanted data between all the other comunication this program reads only a specific pattern:<br>
 **£$name/x_value;y_value$£**<br>
-**IMPORTANT**: there are only two invalid name: "All" and "". If you'll try to plot a series with one of this name the program will ignore it.
+**IMPORTANT**: there are only two invalid name: "All" and "". If you'll try to plot a series with one of these names the program will ignore it.
 <br>
 <br>
 <br>
@@ -78,7 +77,7 @@ In order to identify the wanted data between all the other comunication this pro
 <br>
 <br>
 
-### Arduino sketch for testing the program
+### Arduino sketch to test the program
 ```
 void setup() {
   Serial.begin(9600);
