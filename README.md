@@ -14,9 +14,11 @@ if you find a problem with the dependencies please report it
 <br>
 
 **DEPENDENCIES**<br>
+At the moment the builds that i have tested were made using QtCreator or qt-cmake, an executable contained in Qt. Both ways requires the Qt framework installed on the building machine. I strongly seggest to install the Qt framework with the online installer to use this project, also for the fact that it uses QtGraph, a new entry in QtQUick so it still doesn't have its personal package for the majority of the distribution.<br>
+
 - Debian<br>
 
-```sudo apt install libqt6serialport6 libqt6qml6 libqt6gui6 libglx0 libopengl0 libqt6core6 libstdc++-11-dev libc6 libgcc-s1 libpthreadpool0 libqt6network6 libdlib-dev libegl1 libfontconfig1 libx11-6 libglib2.0-0 libqt6dbus6 libxkbcommon0 libgl1 libz3-4 libfreetype6 qt6-base-dev qt6-base-dev-tools qt6-declarative-dev qt6-serialport-dev```
+```sudo apt install libqt6serialport6 libqt6qml6 libqt6gui6 libglx0 libopengl0 libqt6core6 libstdc++-11-dev libc6 libgcc-s1 libpthreadpool0 libqt6network6 libdlib-dev libegl1 libfontconfig1 libx11-6 libglib2.0-0 libqt6dbus6 libxkbcommon0 libgl1 libz3-4 libfreetype6 qt6-base-dev qt6-base-dev-tools qt6-declarative-dev qt6-serialport-dev qml6-module-qtquick-controls qml6-module-qtquick-shapes qml6-module-qtqml-workerscript```
 
 <br>
 
@@ -27,7 +29,7 @@ cd QML_Serial_Oscilloscope/
 
 mkdir build && cd build
 
-cmake ..
+~/Qt/<QT_VERSION>/gcc_64/bin/qt-cmake ..
 
 cmake --build .
 ```
