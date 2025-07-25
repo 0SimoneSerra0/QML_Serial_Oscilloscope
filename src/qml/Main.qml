@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Shapes
 import QtQuick.Controls
 import "scripts.js" as Scripts
+import "qrc:/src/qml/"
 
 Window {
     id: root

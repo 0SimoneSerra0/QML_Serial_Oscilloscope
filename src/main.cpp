@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
         &app,
         []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
-    engine.loadFromModule("Oscilloscope", "Main");
+    engine.load("qrc:/src/qml/Main.qml");
 
     app.setWindowIcon(QIcon(":/icons/assets/Icon.png"));
 

@@ -4,5 +4,22 @@
         <file>assets/Icon.png</file>
         <file>assets/arrow.png</file>
     </qresource>
-    <qresource prefix="/"/>
+    <qresource prefix="/">
+        <file>src/qml/Main.qml</file>
+        <file>src/qml/SerialPortOption.qml</file>
+        <file>src/qml/SerialIOInterface.qml</file>
+        <file>src/qml/scripts.js</file>
+        <file>src/qml/LineSelectorElement.qml</file>
+        <file>src/qml/LabelPointCoordinates.qml</file>
+        <file>src/qml/GraphControls.qml</file>
+        <file>src/qml/Graph.qml</file>
+        <file>src/qml/ErrorTerminal.qml</file>
+        <file>src/qml/CustomTextField.qml</file>
+        <file>src/qml/CustomTextEdit.qml</file>
+        <file>src/qml/CustomSpinBox.qml</file>
+        <file>src/qml/CustomMouseArea.qml</file>
+        <file>src/qml/CustomLineSeries.qml</file>
+        <file>src/qml/CustomDial.qml</file>
+        <file>src/qml/CustomComboBox.qml</file>
+    </qresource>
 </RCC>
